@@ -1,4 +1,4 @@
-module Lab1
+module InternetApps_5sem
 
 go 1.18
 

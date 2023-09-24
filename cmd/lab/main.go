@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"Lab1/internal/api"
+	"InternetApps_5sem/internal/api"
 )
 
 func main() {
