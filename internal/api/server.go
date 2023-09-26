@@ -2,6 +2,10 @@ package api
 
 import (
 	"log"
+
+	"strconv"
+	"strings"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,7 +45,16 @@ func StartServer() {
 	r.LoadHTMLGlob("templates/*.tmpl")
 
 	r.GET("/cargo", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "start.tmpl", goods)
+		name := c.Query("Name")
+		lowprice := c.Query("LowPrice")
+		highprice := c.Query("HighPrice")
+		filtered_goods := filterGoods(goods, name, lowprice, highprice)
+		c.HTML(http.StatusOK, "start.tmpl", gin.H{
+			"Cargo":      filtered_goods,
+			"searchName": name,
+			"lowPrice":   lowprice,
+			"highPrice":  highprice,
+		})
 	})
 
 	r.GET("/cargo/:name", func(c *gin.Context) {
@@ -58,4 +71,27 @@ func StartServer() {
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 	log.Println("Server down")
+}
+
+func filterGoods(goods []cargo, name_str string, lowprice_str string, highprice_str string) []cargo {
+	lowprice, err1 := strconv.Atoi(lowprice_str)
+	highprice, err2 := strconv.Atoi(highprice_str)
+	nameparts := strings.Split(name_str, " ")
+	if (err1 != nil || lowprice <= 0) && err2 != nil && len(nameparts) <= 0 {
+		return goods
+	}
+	var result []cargo
+	for _, good := range goods {
+		containAll := true
+		for _, part := range nameparts {
+			if !strings.Contains(good.Name, part) {
+				containAll = false
+				break
+			}
+		}
+		if containAll && (err1 != nil || lowprice <= int(good.Price)) && (err2 != nil || highprice >= int(good.Price)) {
+			result = append(result, good)
+		}
+	}
+	return result
 }

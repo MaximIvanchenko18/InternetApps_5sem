@@ -8,9 +8,20 @@
   <body>
     <div id="root">
       <h1 id="title">Грузы для доставки на МКС</h1>
-      <div id="sort"></div>
+      <div id="sort" class="start_div" style="margin-bottom: 20px;">
+        <form action="/cargo" method="get">
+          <label class="input-label">Название</label>
+          <input class="name-input" type="text" id="name-search" name="Name" autocomplete="off" value="{{ .searchName }}">
+          <label class="input-label">Цена от</label>
+          <input class="price-input" type="number" id="price-low" name="LowPrice" placeholder=0 value="{{ .lowPrice }}">
+          <label class="input-label">руб. до</label>
+          <input class="price-input" type="number" id="price-high" name="HighPrice" value="{{ .highPrice }}">
+          <label class="input-label">руб.</label>
+          <button type="submit" class="my-submit-button">Применить</button>
+        </form>
+      </div>
       <div id="cargo" class="start_div">
-        {{ range . }}
+        {{ range .Cargo }}
           <div class="card" onclick="location.href='cargo/{{ .EnglishName }}';">
             <img id="cargo-image" src="{{ .Photo }}" alt="Изображение груза">
             <h2 class="card-text" id="cargo-name">{{ .Name }}</h2>

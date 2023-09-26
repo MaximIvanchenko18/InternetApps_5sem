@@ -16,6 +16,18 @@ body {
     margin-top: 0px;
 }
 
+.input-label {
+    color: white;
+}
+
+.name-input {
+    width: 142px;
+}
+
+.price-input {
+    width: 65px;
+}
+
 .start_div {
     margin-left: 3%;
     display: flex;
