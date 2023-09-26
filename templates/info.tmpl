@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Cargo to ISS</title>
+    <link rel="stylesheet" href="/styles/style.css">
+  </head>
+  <body>
+    <div id="root">
+      <div id="cargo_info" class="info_div">
+        <h1 id="title">{{ .Name }}</h1>
+        <div class="info">
+          <div class="info-text">
+            <h3 id="info-cat">Категория: {{ .Category }}</h3>
+            <h3 id="info-desc">Описание: <span class="info-description">{{ .Description }}</span></h3>
+            <h3 id="info-pr">Цена: <span class="info-price">{{ .Price }} руб./{{ .Unit }}</span></h3>
+            <h3 id="info-rat">Рейтинг: {{ .Rating }}<span class="star">★</span></h3>
+          </div>
+          <div class="info-image-class"><img id="info-image" src="{{ .Photo }}" alt="Изображение груза"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

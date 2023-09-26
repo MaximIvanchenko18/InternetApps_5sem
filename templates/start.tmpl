@@ -3,23 +3,20 @@
   <head>
     <meta charset="UTF-8">
     <title>Cargo to ISS</title>
-    <link rel="stylesheet" href="/styles/start_style.css">
+    <link rel="stylesheet" href="/styles/style.css">
   </head>
   <body>
     <div id="root">
-      <div id="background">
-        <h1 id="title">Грузы для доставки на МКС</h1>
-        <div id="sort"></div>
-        <div id="cargo" class="start_div">
-          {{ range . }}
-            <div class="card">
-              <img id="cargo-image" src="{{ .Photo }}" alt="Изображение груза">
-              <h2 class="card-text" id="cargo-name">{{ .Name }}</h2>
-              <h5 class="card-text" id="cargo-category">Категория: {{ .Category }}</h5>
-              <h3 class="card-text" id="cargo-price">{{ .Price }} руб./{{ .Unit }}</h3>
-            </div>
-          {{ end }}
-        </div>
+      <h1 id="title">Грузы для доставки на МКС</h1>
+      <div id="sort"></div>
+      <div id="cargo" class="start_div">
+        {{ range . }}
+          <div class="card" onclick="location.href='cargo/{{ .EnglishName }}';">
+            <img id="cargo-image" src="{{ .Photo }}" alt="Изображение груза">
+            <h2 class="card-text" id="cargo-name">{{ .Name }}</h2>
+            <h3 class="card-text price" id="cargo-price">{{ .Price }} руб./{{ .Unit }}</h3>
+          </div>
+        {{ end }}
       </div>
     </div>
   </body>
