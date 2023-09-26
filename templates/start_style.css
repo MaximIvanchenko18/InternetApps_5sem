@@ -1,0 +1,45 @@
+body {
+    margin: 0px;
+    margin-top: 0px;
+}
+
+#background {
+    position: relative;
+    background-image: url(/image/background.jpg);
+    background-repeat: repeat;
+}
+
+#title {
+    text-align: center;
+    color: white;
+    padding-top: 15px;
+    margin-top: 0px;
+}
+
+.start_div {
+    margin-left: 3%;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 5%;
+    row-gap: 30px;
+    padding-bottom: 10px;
+}
+
+.card {
+    width: 15%;
+    min-width: 150px;
+    border: 2px solid azure;
+    background-color: azure;
+    border-radius: 7px;
+    padding-top: 3px;
+}
+
+.card-text {
+    margin-block-start: 0.3em;
+    margin-block-end: 0.3em;
+    text-align: center;
+}
+
+#cargo-image {
+    width: 100%;
+}
