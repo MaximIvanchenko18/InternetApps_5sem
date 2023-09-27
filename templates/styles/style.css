@@ -42,6 +42,23 @@ body {
     width: 75%;
     min-width: 150px;
     align-self: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-head {
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.back-button {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+    text-decoration: none;
 }
 
 .card {
@@ -96,11 +113,6 @@ body {
 
 .info-price {
     font-style: italic;
-}
-
-.star {
-    color: yellow;
-    -webkit-text-stroke: 1px black;
 }
 
 .info-image-class {

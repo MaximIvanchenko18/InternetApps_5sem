@@ -22,10 +22,10 @@
       </div>
       <div id="cargo" class="start_div">
         {{ range .Cargo }}
-          <div class="card" onclick="location.href='cargo/{{ .EnglishName }}';">
+          <div class="card" onclick="location.href='/cargo/{{ .EnglishName }}';">
             <img id="cargo-image" src="{{ .Photo }}" alt="Изображение груза">
             <h2 class="card-text" id="cargo-name">{{ .Name }}</h2>
-            <h3 class="card-text price" id="cargo-price">{{ .Price }} руб./{{ .Unit }}</h3>
+            <h3 class="card-text price" id="cargo-price">{{ .Price }} руб./{{ .Weight }} кг</h3>
           </div>
         {{ end }}
       </div>
