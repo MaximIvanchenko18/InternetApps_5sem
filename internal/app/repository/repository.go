@@ -48,7 +48,7 @@ func (r *Repository) GetCargoByID(id int) (*ds.Cargo, error) {
 
 func (r *Repository) GetCargoByEnName(en_name string) (*ds.Cargo, error) {
 	cargo := &ds.Cargo{}
-	err := r.db.Where("english_name = ", en_name).First(&cargo).Error
+	err := r.db.Where("english_name = ?", en_name).First(&cargo).Error
 
 	if err != nil {
 		return nil, err

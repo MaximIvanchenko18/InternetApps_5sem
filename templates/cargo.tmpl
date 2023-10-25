@@ -28,7 +28,7 @@
             <h3 class="card-text price" id="cargo-price">{{ .Price }} руб./{{ .Weight }} кг</h3>
             <form action="/cargo" method="post">
               <input type="hidden" name="delete" value="{{ .CargoId }}">
-              <input type="submit" value="Удалить" class="delete-button">
+              <input class="delete-button" type="submit" value="Удалить">
             </form>
           </div>
         {{ end }}
