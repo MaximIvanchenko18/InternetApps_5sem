@@ -26,6 +26,10 @@
             <img id="cargo-image" src="{{ .Photo }}" alt="Изображение груза">
             <h2 class="card-text" id="cargo-name">{{ .Name }}</h2>
             <h3 class="card-text price" id="cargo-price">{{ .Price }} руб./{{ .Weight }} кг</h3>
+            <form action="/cargo" method="post">
+              <input type="hidden" name="delete" value="{{ .CargoId }}">
+              <input type="submit" value="Удалить" class="delete-button">
+            </form>
           </div>
         {{ end }}
       </div>
