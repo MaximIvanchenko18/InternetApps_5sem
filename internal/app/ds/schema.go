@@ -29,12 +29,12 @@ type Cargo struct {
 type Flight struct {
 	FlightId       uint       `gorm:"primaryKey"`
 	Status         string     `gorm:"size:50;not null"`
-	CreationDate   time.Time  `gorm:"not null;type:date"`
-	FormationDate  *time.Time `gorm:"type:date"`
-	CompletionDate *time.Time `gorm:"type:date"`
+	CreationDate   time.Time  `gorm:"not null;type:timestamp"`
+	FormationDate  *time.Time `gorm:"type:timestamp"`
+	CompletionDate *time.Time `gorm:"type:timestamp"`
 	ClientId       uint       `gorm:"not null"`
-	ModeratorId    uint       `gorm:"not null"`
-	RocketType     string     `gorm:"size:50;not null"`
+	ModeratorId    *uint
+	RocketType     *string `gorm:"size:50"`
 
 	Client    User `gorm:"foreignKey:ClientId"`
 	Moderator User `gorm:"foreignKey:ModeratorId"`

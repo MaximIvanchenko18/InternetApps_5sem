@@ -27,7 +27,7 @@ func New(dsn string) (*Repository, error) {
 func (r *Repository) GetAllCargo() ([]ds.Cargo, error) {
 	var cargo []ds.Cargo
 
-	err := r.db.Find(&cargo).Error
+	err := r.db.Where("is_deleted = ?", false).Find(&cargo).Error
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (r *Repository) GetAllCargo() ([]ds.Cargo, error) {
 
 func (r *Repository) GetCargoByID(id int) (*ds.Cargo, error) {
 	cargo := &ds.Cargo{}
-	err := r.db.Where("cargo_id = ?", id).First(&cargo).Error
+	err := r.db.Where("cargo_id = ? AND is_deleted = ?", id, false).First(&cargo).Error
 
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (r *Repository) GetCargoByID(id int) (*ds.Cargo, error) {
 
 func (r *Repository) GetCargoByEnName(en_name string) (*ds.Cargo, error) {
 	cargo := &ds.Cargo{}
-	err := r.db.Where("english_name = ?", en_name).First(&cargo).Error
+	err := r.db.Where("english_name = ? AND is_deleted = ?", en_name, false).First(&cargo).Error
 
 	if err != nil {
 		return nil, err
@@ -57,24 +57,11 @@ func (r *Repository) GetCargoByEnName(en_name string) (*ds.Cargo, error) {
 	return cargo, nil
 }
 
-func (r *Repository) GetFilteredCargo(name string, lowprice int, highprice int) ([]ds.Cargo, error) {
+func (r *Repository) GetFilteredCargo(name string, lowprice uint, highprice uint) ([]ds.Cargo, error) {
 	var cargo []ds.Cargo
-	var err error = nil
 
-	if lowprice < 0 {
-		lowprice = 0
-	}
-	if highprice < 0 {
-		highprice = 0
-	}
-
-	if highprice > 0 {
-		err = r.db.Where("LOWER(cargos.name) LIKE ? AND price >= ? AND price <= ? AND is_deleted = ?",
-			"%"+strings.ToLower(name)+"%", lowprice, highprice, false).Find(&cargo).Error
-	} else {
-		err = r.db.Where("LOWER(cargos.name) LIKE ? AND price >= ? AND is_deleted = ?",
-			"%"+strings.ToLower(name)+"%", lowprice, false).Find(&cargo).Error
-	}
+	err := r.db.Where("LOWER(cargos.name) LIKE ? AND price >= ? AND price <= ? AND is_deleted = ?",
+		"%"+strings.ToLower(name)+"%", lowprice, highprice, false).Find(&cargo).Error
 
 	if err != nil {
 		return nil, err
@@ -90,4 +77,38 @@ func (r *Repository) DeleteCargoById(id int) error {
 	}
 
 	return nil
+}
+
+func (r *Repository) GetLowestPrice() (uint, error) {
+	cargos, err := r.GetAllCargo()
+
+	if err != nil {
+		return 0, err
+	}
+
+	min_price := cargos[0].Price
+	for _, cargo := range cargos {
+		if cargo.Price < min_price {
+			min_price = cargo.Price
+		}
+	}
+
+	return min_price, nil
+}
+
+func (r *Repository) GetHighestPrice() (uint, error) {
+	cargos, err := r.GetAllCargo()
+
+	if err != nil {
+		return 0, err
+	}
+
+	max_price := cargos[0].Price
+	for _, cargo := range cargos {
+		if cargo.Price > max_price {
+			max_price = cargo.Price
+		}
+	}
+
+	return max_price, nil
 }

@@ -18,13 +18,14 @@ CREATE TABLE "public"."cargos" (
 INSERT INTO "cargos" ("cargo_id", "name", "english_name", "photo", "category", "price", "weight", "capacity", "description", "is_deleted") VALUES
 (1,	'Кислород',	'oxygen',	'/image/oxygen.jpg',	'Кислород',	19500,	60,	0.05,	'Кислород в баллонах под высоким давлением',	'f'),
 (2,	'Вода',	'water',	'/image/water.jpg',	'Напитки',	110,	0.5,	0.0005,	'Вода родниковая очищенная',	'f'),
-(3,	'Чай черный',	'tea',	'/image/tea.jpg',	'Напитки',	750,	0.003,	0.0003,	'Чай черный цейлонский без сахара в специализированном пакете',	'f'),
 (4,	'Кофе с молоком и сахаром',	'coffee',	'/image/coffee.jpg',	'Напитки',	1140,	0.03,	0.0002,	'Кофе натуральный Arabica, натуральное молоко, сахар-песок',	'f'),
-(5,	'Кисель вишневый',	'kisel',	'/image/kisel.jpg',	'Напитки',	25,	0.12,	0.00005,	'Сахар-песок, крахмал, сок вишневый концентрированный, витаминная смесь, кислота лимонная',	'f'),
 (6,	'Хлеб пшеничный',	'bread',	'/image/bread.jpg',	'Еда',	380,	0.03,	0.00015,	'Мука пшеничная, вода, маргарин, сахар, дрожжи, соль, молоко сухое',	'f'),
 (7,	'Каша гречневая с мясом',	'meat_and_grecha',	'/image/meat_grecha.jpg',	'Еда',	15,	0.06,	0.00025,	'Крупа гречневая, соль, жир, фарш говяжий сушеный, лук сушеный, аромат говядины',	'f'),
 (8,	'Борщ с мясом',	'borsh',	'/image/borsh.jpg',	'Еда',	1100,	0.03,	0.0003,	'Мясо-говядина крупнокусковое, картофель, капуста свежая, свекла, морковь, лук репчатый, корень петрушки, томатная паста, пюре из перца, сахар-песок, масло топленое, соль поваренная, лимонная кислота, лист лавровый, перец черный молотый, бульон',	'f'),
 (9,	'Печенье Восток',	'biscuits',	'/image/biscuits.jpg',	'Еда',	510,	0.03,	0.0002,	'Мука высшего сорта, крахмал маисовый, сахарная пудра, инвертный сироп, маргарин, молоко цельное, ванильная пудра, соль, сода, аммоний, эссенция',	'f'),
+(11,	'Ассорти',	'assorti',	'/image/assorti.jpg',	'Еда',	200,	0.12,	0.0035,	'Ассорти вкуснейшее',	't'),
+(5,	'Кисель вишневый',	'kisel',	'/image/kisel.jpg',	'Напитки',	25,	0.12,	0.00005,	'Сахар-песок, крахмал, сок вишневый концентрированный, витаминная смесь, кислота лимонная',	'f'),
+(3,	'Чай черный',	'tea',	'/image/tea.jpg',	'Напитки',	750,	0.003,	0.0003,	'Чай черный цейлонский без сахара в специализированном пакете',	'f'),
 (10,	'Посылка от родных',	'personal',	'/image/personal.jpg',	'Личные вещи',	0,	1,	0.125,	'Личные посылки от родственников и друзей космонавтов',	'f');
 
 DROP TABLE IF EXISTS "flight_cargos";
@@ -54,21 +55,21 @@ CREATE SEQUENCE flights_flight_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036
 CREATE TABLE "public"."flights" (
     "flight_id" bigint DEFAULT nextval('flights_flight_id_seq') NOT NULL,
     "status" character varying(50) NOT NULL,
-    "creation_date" date NOT NULL,
-    "formation_date" date,
-    "completion_date" date,
+    "creation_date" timestamp NOT NULL,
+    "formation_date" timestamp,
+    "completion_date" timestamp,
     "client_id" bigint NOT NULL,
-    "moderator_id" bigint NOT NULL,
-    "rocket_type" character varying(50) NOT NULL,
+    "moderator_id" bigint,
+    "rocket_type" character varying(50),
     CONSTRAINT "flights_pkey" PRIMARY KEY ("flight_id")
 ) WITH (oids = false);
 
 INSERT INTO "flights" ("flight_id", "status", "creation_date", "formation_date", "completion_date", "client_id", "moderator_id", "rocket_type") VALUES
-(1,	'Завершен',	'2022-12-31',	'2023-01-12',	'2023-02-09',	4,	1,	'Прогресс'),
-(2,	'Черновик',	'2023-10-07',	NULL,	NULL,	3,	2,	'Crew'),
-(3,	'Удален',	'2023-05-21',	NULL,	NULL,	1,	1,	'Прогресс'),
-(4,	'Сформирован',	'2023-06-01',	'2023-09-15',	NULL,	2,	2,	'Crew'),
-(5,	'Отклонен',	'2023-06-02',	NULL,	NULL,	3,	2,	'CRS');
+(1,	'Завершен',	'2022-12-31 19:43:42',	'2023-01-12 12:00:01',	'2023-02-09 04:55:13',	4,	1,	'Прогресс'),
+(2,	'Черновик',	'2023-10-07 23:21:58',	NULL,	NULL,	3,	NULL,	'Crew'),
+(3,	'Удален',	'2023-05-21 01:12:29',	NULL,	NULL,	1,	NULL,	'Прогресс'),
+(4,	'Сформирован',	'2023-06-01 15:12:01',	'2023-09-15 05:05:05',	NULL,	2,	NULL,	'Crew'),
+(5,	'Отклонен',	'2023-06-02 12:34:21',	NULL,	NULL,	3,	2,	NULL);
 
 DROP TABLE IF EXISTS "users";
 DROP SEQUENCE IF EXISTS users_user_id_seq;
@@ -95,4 +96,4 @@ ALTER TABLE ONLY "public"."flight_cargos" ADD CONSTRAINT "fk_flight_cargos_fligh
 ALTER TABLE ONLY "public"."flights" ADD CONSTRAINT "fk_flights_client" FOREIGN KEY (client_id) REFERENCES users(user_id) NOT DEFERRABLE;
 ALTER TABLE ONLY "public"."flights" ADD CONSTRAINT "fk_flights_moderator" FOREIGN KEY (moderator_id) REFERENCES users(user_id) NOT DEFERRABLE;
 
--- 2023-10-25 01:56:52.65545+00
+-- 2023-11-05 22:12:20.783009+00

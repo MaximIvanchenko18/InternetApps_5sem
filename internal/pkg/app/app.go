@@ -31,14 +31,27 @@ func (a *Application) StartServer() {
 		name := c.Query("Name")
 		lowprice_str := c.Query("LowPrice")
 		highprice_str := c.Query("HighPrice")
+		button_str := c.Query("Filter")
 
-		lowprice, err1 := strconv.Atoi(lowprice_str)
-		highprice, err2 := strconv.Atoi(highprice_str)
-		if err1 != nil {
-			lowprice = 0
-		}
-		if err2 != nil {
-			highprice = 0
+		var lowprice uint
+		var highprice uint
+		if button_str != "" {
+			lowprice64, err1 := strconv.ParseUint(lowprice_str, 10, 64)
+			highprice64, err2 := strconv.ParseUint(highprice_str, 10, 64)
+			if err1 != nil {
+				lowprice, _ = a.repo.GetLowestPrice()
+			} else {
+				lowprice = uint(lowprice64)
+			}
+			if err2 != nil {
+				highprice, _ = a.repo.GetHighestPrice()
+			} else {
+				highprice = uint(highprice64)
+			}
+		} else {
+			name = ""
+			lowprice, _ = a.repo.GetLowestPrice()
+			highprice, _ = a.repo.GetHighestPrice()
 		}
 
 		goods, err := a.repo.GetFilteredCargo(name, lowprice, highprice)
@@ -79,7 +92,10 @@ func (a *Application) StartServer() {
 
 		a.repo.DeleteCargoById(id)
 
-		goods, err := a.repo.GetFilteredCargo("", 0, 0)
+		lowprice, _ := a.repo.GetLowestPrice()
+		highprice, _ := a.repo.GetHighestPrice()
+
+		goods, err := a.repo.GetFilteredCargo("", lowprice, highprice)
 
 		if err != nil {
 			log.Println("Goods can not be filtered!")
@@ -89,8 +105,8 @@ func (a *Application) StartServer() {
 		c.HTML(http.StatusOK, "cargo.tmpl", gin.H{
 			"Cargo":      goods,
 			"searchName": "",
-			"lowPrice":   0,
-			"highPrice":  0,
+			"lowPrice":   lowprice,
+			"highPrice":  highprice,
 		})
 	})
 
