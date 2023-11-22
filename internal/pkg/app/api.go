@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -41,11 +42,11 @@ func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader,
 }
 
 func (app *Application) getClient() string {
-	return "2d217868-ab6d-41fe-9b34-7809083a2e8a"
+	return "74623bbc-7f31-4be8-9e43-05fcdd324886"
 }
 
 func (app *Application) getModerator() *string {
-	moderaorId := "87d54d58-1e24-4cca-9c83-bd2523902729"
+	moderaorId := "0aaf11f2-8827-4e60-885c-cc68cc86c68a"
 	return &moderaorId
 }
 
@@ -159,6 +160,8 @@ func (app *Application) AddCargo(c *gin.Context) {
 	}
 
 	cargo := ds.Cargo(request.Cargo)
+	cargo.Weight = math.Round(cargo.Weight*1000) / 1000
+	cargo.Capacity = math.Round(cargo.Capacity*100000) / 100000
 	err = app.repo.AddCargo(&cargo)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -249,13 +252,18 @@ func (app *Application) ChangeCargo(c *gin.Context) {
 
 func (app *Application) AddToFlight(c *gin.Context) {
 	var request schemes.AddToFlightRequest
-	err := c.ShouldBindUri(&request)
+	err := c.ShouldBindUri(&request.URI)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	err = c.ShouldBind(&request)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	cargo, err := app.repo.GetCargoByID(request.CargoId)
+	cargo, err := app.repo.GetCargoByID(request.URI.CargoId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -280,7 +288,7 @@ func (app *Application) AddToFlight(c *gin.Context) {
 		}
 	}
 
-	err = app.repo.AddToFlight(flight.UUID, request.CargoId, request.Quantity)
+	err = app.repo.AddToFlight(flight.UUID, request.URI.CargoId, request.Quantity)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -447,6 +455,57 @@ func (app *Application) DeleteFromFlight(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.AllCargosResponse{Cargos: cargos})
 }
 
+func (app *Application) UpdateFlightCargoQuantity(c *gin.Context) {
+	var request schemes.UpdateFlightCargoQuantityRequest
+	err := c.ShouldBindUri(&request.URI)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	err = c.ShouldBind(&request)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+
+	flight, err := app.repo.GetFlightById(request.URI.FlightId, app.getClient())
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	if flight == nil {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("полет не найден"))
+		return
+	}
+
+	cargos, err := app.repo.GetFlightCargos(request.URI.FlightId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	isCargoInFlight := false
+	for _, cargo := range cargos {
+		if cargo.UUID == request.URI.CargoId {
+			isCargoInFlight = true
+			break
+		}
+	}
+	if !isCargoInFlight {
+		c.AbortWithError(http.StatusNotFound, fmt.Errorf("груз в полете не найден"))
+		return
+	}
+
+	flightcargo := &ds.FlightCargo{FlightId: request.URI.FlightId, CargoId: request.URI.CargoId, Quantity: request.Quantity}
+	err = app.repo.SaveFlightCargo(flightcargo)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, flightcargo)
+}
+
 func (app *Application) UserConfirm(c *gin.Context) {
 	var request schemes.UserConfirmRequest
 	err := c.ShouldBindUri(&request)
@@ -515,7 +574,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 	}
 
 	if flight.Status != ds.FORMED {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус \"%s\" на \"%s\"", flight.Status, request.Status))
+		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя изменить статус %s на %s", flight.Status, request.Status))
 		return
 	}
 

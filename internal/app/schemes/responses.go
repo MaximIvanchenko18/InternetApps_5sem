@@ -46,18 +46,18 @@ func ConvertFlight(flight *ds.Flight) FlightOutput {
 	output := FlightOutput{
 		UUID:         flight.UUID,
 		Status:       flight.Status,
-		CreationDate: flight.CreationDate.Format("2003-10-15 18:10:18"),
+		CreationDate: flight.CreationDate.Format("2006-01-02 15:04:05"),
 		RocketType:   flight.RocketType,
 		Client:       flight.Client.Name,
 	}
 
 	if flight.FormationDate != nil {
-		formationDate := flight.FormationDate.Format("2003-10-15 18:10:18")
+		formationDate := flight.FormationDate.Format("2006-01-02 15:04:05")
 		output.FormationDate = &formationDate
 	}
 
 	if flight.CompletionDate != nil {
-		completionDate := flight.CompletionDate.Format("2003-10-15 18:10:18")
+		completionDate := flight.CompletionDate.Format("2006-01-02 15:04:05")
 		output.CompletionDate = &completionDate
 	}
 

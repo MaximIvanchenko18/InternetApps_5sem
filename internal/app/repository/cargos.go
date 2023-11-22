@@ -130,3 +130,13 @@ func (r *Repository) AddToFlight(flightId string, cargoId string, quantity uint)
 
 	return nil
 }
+
+func (r *Repository) SaveFlightCargo(flightcargo *ds.FlightCargo) error {
+	err := r.db.Save(flightcargo).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

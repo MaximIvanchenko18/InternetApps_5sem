@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-const DRAFT string = "Черновик"
-const DELETED string = "Удален"
-const FORMED string = "Сформирован"
-const COMPLETED string = "Завершен"
-const REJECTED string = "Отклонен"
+const DRAFT string = "черновик"
+const DELETED string = "удален"
+const FORMED string = "сформирован"
+const COMPLETED string = "завершен"
+const REJECTED string = "отклонен"
 
 type User struct {
 	UUID        string `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
@@ -26,8 +26,8 @@ type Cargo struct {
 	Photo       *string `gorm:"size:100" json:"photo"`
 	Category    string  `gorm:"size:50;not null" form:"category" json:"category" binding:"required"`
 	Price       uint    `gorm:"not null" form:"price" json:"price" binding:"required"`       // Rubles
-	Weight      float32 `gorm:"not null" form:"weight" json:"weight" binding:"required"`     // kg
-	Capacity    float32 `gorm:"not null" form:"capacity" json:"capacity" binding:"required"` // m^3
+	Weight      float64 `gorm:"not null" form:"weight" json:"weight" binding:"required"`     // kg
+	Capacity    float64 `gorm:"not null" form:"capacity" json:"capacity" binding:"required"` // m^3
 	Description string  `gorm:"size:500;not null" form:"description" json:"description" binding:"required"`
 	IsDeleted   bool    `gorm:"not null;default:false"`
 }

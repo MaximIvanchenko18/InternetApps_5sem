@@ -29,19 +29,21 @@ type ChangeCargoRequest struct {
 	Image       *multipart.FileHeader `form:"image" json:"image"`
 	Category    *string               `form:"category" json:"category" binding:"omitempty,max=50"`
 	Price       *uint                 `form:"price" json:"price"`
-	Weight      *float32              `form:"weight" json:"weight"`
-	Capacity    *float32              `form:"capacity" json:"capacity"`
+	Weight      *float64              `form:"weight" json:"weight"`
+	Capacity    *float64              `form:"capacity" json:"capacity"`
 	Description *string               `form:"description" json:"description" binding:"omitempty,max=500"`
 }
 
 type AddToFlightRequest struct {
-	CargoId  string `uri:"cargo_id" binding:"required,uuid"`
-	Quantity uint   `form:"quantity"`
+	URI struct {
+		CargoId string `uri:"cargo_id" binding:"required,uuid"`
+	}
+	Quantity uint `form:"quantity"`
 }
 
 type GetAllFlightsRequest struct {
-	FormDateStart *time.Time `form:"form_date_start" json:"form_date_start" time_format:"2003-10-15 18:10:18"`
-	FormDateEnd   *time.Time `form:"form_date_end" json:"form_date_end" time_format:"2003-10-15 18:10:18"`
+	FormDateStart *time.Time `form:"form_date_start" json:"form_date_start" time_format:"2006-01-02 15:04:05"`
+	FormDateEnd   *time.Time `form:"form_date_end" json:"form_date_end" time_format:"2006-01-02 15:04:05"`
 	Status        string     `form:"status"`
 }
 
@@ -59,6 +61,14 @@ type UpdateFlightRequest struct {
 type DeleteFromFlightRequest struct {
 	FlightId string `uri:"flight_id" binding:"required,uuid"`
 	CargoId  string `uri:"cargo_id" binding:"required,uuid"`
+}
+
+type UpdateFlightCargoQuantityRequest struct {
+	URI struct {
+		FlightId string `uri:"flight_id" binding:"required,uuid"`
+		CargoId  string `uri:"cargo_id" binding:"required,uuid"`
+	}
+	Quantity uint `form:"quantity"`
 }
 
 type UserConfirmRequest struct {

@@ -39,13 +39,14 @@ func (app *Application) StartServer() {
 	r.POST("/api/cargo/:cargo_id/add_to_flight", app.AddToFlight) // Добавление в полет
 
 	// ПОЛЕТЫ (заявки)
-	r.GET("/api/flights", app.GetAllFlights)                                         // Отфильтрованный список (интервал дат и статус)
-	r.GET("/api/flights/:flight_id", app.GetFlight)                                  // Один полет
-	r.PUT("/api/flights/:flight_id/update", app.UpdateFlight)                        // Изменение полета (тип ракеты)
-	r.DELETE("/api/flights/:flight_id", app.DeleteFlight)                            // Удаление полета
-	r.DELETE("/api/flights/:flight_id/delete_cargo/:cargo_id", app.DeleteFromFlight) // Удаление груза из заявки
-	r.PUT("/api/flights/:flight_id/user_confirm", app.UserConfirm)                   // Сформировать создателем
-	r.PUT("/api/flights/:flight_id/moderator_confirm", app.ModeratorConfirm)         // Завершить/отклонить модератором
+	r.GET("/api/flights", app.GetAllFlights)                                               // Отфильтрованный список (интервал дат и статус)
+	r.GET("/api/flights/:flight_id", app.GetFlight)                                        // Один полет
+	r.PUT("/api/flights/:flight_id/update", app.UpdateFlight)                              // Изменение полета (тип ракеты)
+	r.DELETE("/api/flights/:flight_id", app.DeleteFlight)                                  // Удаление полета
+	r.DELETE("/api/flights/:flight_id/delete_cargo/:cargo_id", app.DeleteFromFlight)       // Удаление груза из заявки
+	r.PUT("/api/flights/:flight_id/change_cargo/:cargo_id", app.UpdateFlightCargoQuantity) // Изменение кол-ва груза в полете
+	r.PUT("/api/flights/:flight_id/user_confirm", app.UserConfirm)                         // Сформировать создателем
+	r.PUT("/api/flights/:flight_id/moderator_confirm", app.ModeratorConfirm)               // Завершить/отклонить модератором
 
 	r.Run("0.0.0.0:7000") // listen and serve on 0.0.0.0:7000 (for windows "localhost:7000")
 
