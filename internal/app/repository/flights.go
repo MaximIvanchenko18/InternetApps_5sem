@@ -13,7 +13,7 @@ func (r *Repository) GetAllFlights(formDateStart *time.Time, formDateEnd *time.T
 	var flights []ds.Flight
 	query := r.db.Preload("Client").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Where("status != ?", ds.DELETED)
+		Where("status != ? AND status != ?", ds.DELETED, ds.DRAFT)
 
 	if formDateStart != nil && formDateEnd != nil {
 		query = query.Where("formation_date BETWEEN ? AND ?", *formDateStart, *formDateEnd)
