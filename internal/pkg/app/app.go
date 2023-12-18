@@ -15,6 +15,8 @@ import (
 	"InternetApps_5sem/internal/app/repository"
 	"InternetApps_5sem/internal/app/role"
 
+	_ "InternetApps_5sem/docs"
+
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

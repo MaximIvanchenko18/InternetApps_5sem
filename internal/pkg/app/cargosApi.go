@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	_ "InternetApps_5sem/docs"
 	"InternetApps_5sem/internal/app/ds"
 	"InternetApps_5sem/internal/app/schemes"
 

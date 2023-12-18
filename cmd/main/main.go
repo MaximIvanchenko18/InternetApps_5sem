@@ -10,7 +10,7 @@ import (
 // @title Cargo transfer to ISS
 // @version 1.0
 
-// @host 127.0.0.1:80
+// @host 127.0.0.1:8000
 // @schemes http
 // @BasePath /
 

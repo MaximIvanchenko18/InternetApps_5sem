@@ -1,0 +1,562 @@
+basePath: /
+definitions:
+  app.SwaggerUpdateFlightRequest:
+    properties:
+      rocket_type:
+        type: string
+    type: object
+  ds.Cargo:
+    properties:
+      capacity:
+        description: m^3
+        type: number
+      category:
+        type: string
+      description:
+        type: string
+      en_name:
+        type: string
+      isDeleted:
+        type: boolean
+      name:
+        type: string
+      photo:
+        type: string
+      price:
+        description: Rubles
+        type: integer
+      uuid:
+        type: string
+      weight:
+        description: kg
+        type: number
+    required:
+    - capacity
+    - category
+    - description
+    - en_name
+    - name
+    - price
+    - weight
+    type: object
+  schemes.AddToFlightResp:
+    properties:
+      cargo_count:
+        type: integer
+    type: object
+  schemes.AllCargosResponse:
+    properties:
+      cargos:
+        items:
+          $ref: '#/definitions/ds.Cargo'
+        type: array
+    type: object
+  schemes.AllFlightsResponse:
+    properties:
+      flights:
+        items:
+          $ref: '#/definitions/schemes.FlightOutput'
+        type: array
+    type: object
+  schemes.FlightOutput:
+    properties:
+      completion_date:
+        type: string
+      creation_date:
+        type: string
+      customer:
+        type: string
+      formation_date:
+        type: string
+      moderator:
+        type: string
+      rocket_type:
+        type: string
+      shipment_status:
+        type: string
+      status:
+        type: string
+      uuid:
+        type: string
+    type: object
+  schemes.FlightResponse:
+    properties:
+      cargos:
+        items:
+          $ref: '#/definitions/ds.Cargo'
+        type: array
+      flight:
+        $ref: '#/definitions/schemes.FlightOutput'
+    type: object
+  schemes.FlightShort:
+    properties:
+      cargo_count:
+        type: integer
+      uuid:
+        type: string
+    type: object
+  schemes.GetAllCargosResponse:
+    properties:
+      cargos:
+        items:
+          $ref: '#/definitions/ds.Cargo'
+        type: array
+      draft_flight:
+        $ref: '#/definitions/schemes.FlightShort'
+    type: object
+  schemes.LoginReq:
+    properties:
+      login:
+        maxLength: 30
+        type: string
+      password:
+        maxLength: 40
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  schemes.RegisterReq:
+    properties:
+      login:
+        maxLength: 30
+        type: string
+      password:
+        maxLength: 40
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  schemes.RegisterResp:
+    properties:
+      ok:
+        type: boolean
+    type: object
+  schemes.SwaggerLoginResp:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      token_type:
+        type: string
+    type: object
+  schemes.UpdateFlightResponse:
+    properties:
+      flight:
+        $ref: '#/definitions/schemes.FlightOutput'
+    type: object
+host: 127.0.0.1:8000
+info:
+  contact: {}
+  title: Cargo transfer to ISS
+  version: "1.0"
+paths:
+  /api/cargo:
+    get:
+      description: Возвращает все доступные грузы с опциональной фильтрацией по названию
+        и диапазону цены
+      parameters:
+      - description: Название груза для фильтрации
+        in: query
+        name: name
+        type: string
+      - description: Нижний порог цены для фильтрации
+        in: query
+        name: low_price
+        type: string
+      - description: Верхний порог цены для фильтрации
+        in: query
+        name: high_price
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.GetAllCargosResponse'
+      summary: Получить все грузы
+      tags:
+      - Грузы
+  /api/cargo/:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Добавить новый груз
+      parameters:
+      - description: Изображение груза
+        in: formData
+        name: image
+        type: file
+      - description: Название
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Английское название
+        in: formData
+        name: en_name
+        required: true
+        type: string
+      - description: Категория
+        in: formData
+        name: category
+        required: true
+        type: string
+      - description: Цена
+        in: formData
+        name: price
+        required: true
+        type: integer
+      - description: Вес
+        in: formData
+        name: weight
+        required: true
+        type: number
+      - description: Объем
+        in: formData
+        name: capacity
+        required: true
+        type: number
+      - description: Описание
+        in: formData
+        name: description
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Добавить груз
+      tags:
+      - Грузы
+  /api/cargo/{cargo_id}:
+    delete:
+      description: Удаляет груз по id
+      parameters:
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить груз
+      tags:
+      - Грузы
+    get:
+      description: Возвращает подробную информацию об одном грузе
+      parameters:
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ds.Cargo'
+      summary: Получить один груз
+      tags:
+      - Грузы
+    put:
+      consumes:
+      - multipart/form-data
+      description: Изменить данные о грузе
+      parameters:
+      - description: Идентификатор груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      - description: Изображение груза
+        in: formData
+        name: image
+        type: file
+      - description: Название
+        in: formData
+        name: name
+        type: string
+      - description: Английское название
+        in: formData
+        name: en_name
+        type: string
+      - description: Категория
+        in: formData
+        name: category
+        type: string
+      - description: Цена
+        in: formData
+        name: price
+        type: integer
+      - description: Вес
+        in: formData
+        name: weight
+        type: number
+      - description: Объем
+        in: formData
+        name: capacity
+        type: number
+      - description: Описание
+        in: formData
+        name: description
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Изменить груз
+      tags:
+      - Грузы
+  /api/cargo/{cargo_id}/add_to_flight:
+    post:
+      description: Добавить выбранный груз в черновик полета
+      parameters:
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AddToFlightResp'
+      summary: Добавить груз в полет
+      tags:
+      - Грузы
+  /api/flights:
+    get:
+      description: Возвращает все полеты с фильтрацией по статусу и дате формирования
+      parameters:
+      - description: статус полета
+        in: query
+        name: status
+        type: string
+      - description: начальная дата формирования
+        in: query
+        name: form_date_start
+        type: string
+      - description: конечная дата формирвания
+        in: query
+        name: form_date_end
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllFlightsResponse'
+      summary: Получить все полеты
+      tags:
+      - Полеты
+  /api/flights/{flight_id}:
+    delete:
+      description: Удаляет полет по id
+      parameters:
+      - description: id полета
+        in: path
+        name: flight_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+      summary: Удалить полет
+      tags:
+      - Полеты
+    get:
+      description: Возвращает подробную информацию о полете
+      parameters:
+      - description: id полета
+        in: path
+        name: flight_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.FlightResponse'
+      summary: Получить один полет
+      tags:
+      - Полеты
+    put:
+      description: Позволяет изменить тип ракеты
+      parameters:
+      - description: id полета
+        in: path
+        name: flight_id
+        required: true
+        type: string
+      - description: Тип ракеты
+        in: body
+        name: rocket_type
+        required: true
+        schema:
+          $ref: '#/definitions/app.SwaggerUpdateFlightRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.UpdateFlightResponse'
+      summary: Указать тип ракеты
+      tags:
+      - Полеты
+  /api/flights/{flight_id}/change_cargo/{cargo_id}:
+    put:
+      description: Изменить количество груза в полете
+      parameters:
+      - description: id полета
+        in: path
+        name: flight_id
+        required: true
+        type: string
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      - description: количество груза
+        in: query
+        name: quantity
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Изменить количество груза в полете
+      tags:
+      - Полеты
+  /api/flights/{flight_id}/delete_cargo/{cargo_id}:
+    delete:
+      description: Удалить груз из полета
+      parameters:
+      - description: id полета
+        in: path
+        name: flight_id
+        required: true
+        type: string
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllCargosResponse'
+      summary: Удалить груз из полета
+      tags:
+      - Полеты
+  /api/flights/{flight_id}/moderator_confirm:
+    put:
+      description: Завершить или отклонить полет модератором
+      parameters:
+      - description: id полета
+        in: path
+        name: flight_id
+        required: true
+        type: string
+      - description: подтвердить
+        in: body
+        name: confirm
+        required: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: OK
+      summary: Завершить полет
+      tags:
+      - Полеты
+  /api/flights/user_confirm:
+    put:
+      description: Сформировать полет пользователем
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.FlightOutput'
+      summary: Сформировать полет
+      tags:
+      - Полеты
+  /api/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизует пользователя по логину, паролю и отдаёт jwt токен для
+        дальнейших запросов
+      parameters:
+      - description: login and password
+        in: body
+        name: user_credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemes.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.SwaggerLoginResp'
+      summary: Авторизация
+      tags:
+      - Авторизация
+  /api/user/logout:
+    post:
+      consumes:
+      - application/json
+      description: Выход из аккаунта
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Выйти из аккаунта
+      tags:
+      - Авторизация
+  /api/user/sign_up:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя
+      parameters:
+      - description: login and password
+        in: body
+        name: user_credentials
+        required: true
+        schema:
+          $ref: '#/definitions/schemes.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.RegisterResp'
+      summary: Регистрация
+      tags:
+      - Авторизация
+schemes:
+- http
+swagger: "2.0"
