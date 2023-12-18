@@ -2,6 +2,7 @@ package schemes
 
 import (
 	"InternetApps_5sem/internal/app/ds"
+	"time"
 )
 
 type AllCargosResponse struct {
@@ -37,18 +38,20 @@ type FlightOutput struct {
 	CreationDate   string  `json:"creation_date"`
 	FormationDate  *string `json:"formation_date"`
 	CompletionDate *string `json:"completion_date"`
-	Client         string  `json:"customer"`
+	Customer       string  `json:"customer"`
 	Moderator      *string `json:"moderator"`
-	RocketType     string  `json:"rocket_type"`
+	RocketType     *string `json:"rocket_type"`
+	ShipmentStatus *string `json:"shipment_status"`
 }
 
 func ConvertFlight(flight *ds.Flight) FlightOutput {
 	output := FlightOutput{
-		UUID:         flight.UUID,
-		Status:       flight.Status,
-		CreationDate: flight.CreationDate.Format("2006-01-02 15:04:05"),
-		RocketType:   flight.RocketType,
-		Client:       flight.Client.Name,
+		UUID:           flight.UUID,
+		Status:         flight.Status,
+		CreationDate:   flight.CreationDate.Format("2006-01-02 15:04:05"),
+		RocketType:     flight.RocketType,
+		Customer:       flight.Customer.Login,
+		ShipmentStatus: flight.ShipmentStatus,
 	}
 
 	if flight.FormationDate != nil {
@@ -62,8 +65,28 @@ func ConvertFlight(flight *ds.Flight) FlightOutput {
 	}
 
 	if flight.Moderator != nil {
-		output.Moderator = &flight.Moderator.Name
+		output.Moderator = &flight.Moderator.Login
 	}
 
 	return output
+}
+
+type AddToFlightResp struct {
+	CargoCount int64 `json:"cargo_count"`
+}
+
+type LoginResp struct {
+	ExpiresIn   time.Duration `json:"expires_in"`
+	AccessToken string        `json:"access_token"`
+	TokenType   string        `json:"token_type"`
+}
+
+type SwaggerLoginResp struct {
+	ExpiresIn   int64  `json:"expires_in"`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
+}
+
+type RegisterResp struct {
+	Ok bool `json:"ok"`
 }

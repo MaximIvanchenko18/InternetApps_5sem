@@ -1,22 +1,25 @@
 package ds
 
 import (
-	// "gorm.io/gorm"
+	"InternetApps_5sem/internal/app/role"
 	"time"
 )
 
-const DRAFT string = "черновик"
-const DELETED string = "удален"
-const FORMED string = "сформирован"
-const COMPLETED string = "завершен"
-const REJECTED string = "отклонен"
+const StatusDraft string = "черновик"
+const StatusDeleted string = "удален"
+const StatusFormed string = "сформирован"
+const StatusCompleted string = "завершен"
+const StatusRejected string = "отклонен"
+
+const ShipmentCompleted string = "отправлено"
+const ShipmentFailed string = "отправка отменена"
+const ShipmentStarted string = "отправка начата"
 
 type User struct {
-	UUID        string `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	Name        string `gorm:"size:30;not null" json:"name"`
-	Login       string `gorm:"size:30;not null"`
-	Password    string `gorm:"size:30;not null"`
-	IsModerator bool   `gorm:"not null;default:false"`
+	UUID     string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`
+	Role     role.Role
+	Login    string `gorm:"size:30;not null" json:"login"`
+	Password string `gorm:"size:40;not null" json:"-"`
 }
 
 type Cargo struct {
@@ -38,11 +41,12 @@ type Flight struct {
 	CreationDate   time.Time  `gorm:"not null;type:timestamp"`
 	FormationDate  *time.Time `gorm:"type:timestamp"`
 	CompletionDate *time.Time `gorm:"type:timestamp"`
-	ClientId       string     `gorm:"not null"`
+	CustomerId     string     `gorm:"not null"`
 	ModeratorId    *string    `json:"-"`
-	RocketType     string     `gorm:"size:50"`
+	RocketType     *string    `gorm:"size:50"`
+	ShipmentStatus *string    `gorm:"size:40"`
 
-	Client    User
+	Customer  User
 	Moderator *User
 }
 

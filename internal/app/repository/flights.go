@@ -9,11 +9,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func (r *Repository) GetAllFlights(formDateStart *time.Time, formDateEnd *time.Time, status string) ([]ds.Flight, error) {
+func (r *Repository) GetAllFlights(customerId *string, formDateStart *time.Time, formDateEnd *time.Time, status string) ([]ds.Flight, error) {
 	var flights []ds.Flight
-	query := r.db.Preload("Client").Preload("Moderator").
+	query := r.db.Preload("Customer").Preload("Moderator").
 		Where("LOWER(status) LIKE ?", "%"+strings.ToLower(status)+"%").
-		Where("status != ? AND status != ?", ds.DELETED, ds.DRAFT)
+		Where("status != ? AND status != ?", ds.StatusDeleted, ds.StatusDraft)
+
+	if customerId != nil {
+		query = query.Where("customer_id = ?", *customerId)
+	}
 
 	if formDateStart != nil && formDateEnd != nil {
 		query = query.Where("formation_date BETWEEN ? AND ?", *formDateStart, *formDateEnd)
@@ -31,9 +35,9 @@ func (r *Repository) GetAllFlights(formDateStart *time.Time, formDateEnd *time.T
 	return flights, nil
 }
 
-func (r *Repository) GetDraftFlight(clientId string) (*ds.Flight, error) {
+func (r *Repository) GetDraftFlight(customerId string) (*ds.Flight, error) {
 	flight := &ds.Flight{}
-	err := r.db.First(flight, ds.Flight{Status: ds.DRAFT, ClientId: clientId}).Error
+	err := r.db.First(flight, ds.Flight{Status: ds.StatusDraft, CustomerId: customerId}).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -45,8 +49,8 @@ func (r *Repository) GetDraftFlight(clientId string) (*ds.Flight, error) {
 	return flight, nil
 }
 
-func (r *Repository) CreateDraftFlight(clientId string) (*ds.Flight, error) {
-	flight := &ds.Flight{Status: ds.DRAFT, CreationDate: time.Now(), ClientId: clientId}
+func (r *Repository) CreateDraftFlight(customerId string) (*ds.Flight, error) {
+	flight := &ds.Flight{Status: ds.StatusDraft, CreationDate: time.Now(), CustomerId: customerId}
 
 	err := r.db.Create(flight).Error
 	if err != nil {
@@ -56,11 +60,16 @@ func (r *Repository) CreateDraftFlight(clientId string) (*ds.Flight, error) {
 	return flight, nil
 }
 
-func (r *Repository) GetFlightById(flightId string, clientId string) (*ds.Flight, error) {
+func (r *Repository) GetFlightById(flightId string, customerId *string) (*ds.Flight, error) {
 	flight := &ds.Flight{}
-	err := r.db.Preload("Client").Preload("Moderator").
-		Where("status != ?", ds.DELETED).
-		First(flight, ds.Flight{UUID: flightId, ClientId: clientId}).Error
+	query := r.db.Preload("Customer").Preload("Moderator").
+		Where("status != ?", ds.StatusDeleted)
+
+	if customerId != nil {
+		query = query.Where("customer_id = ?", customerId)
+	}
+
+	err := query.First(flight, ds.Flight{UUID: flightId}).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -106,4 +115,17 @@ func (r *Repository) DeleteFromFlight(flightId string, cargoId string) error {
 	}
 
 	return nil
+}
+
+func (r *Repository) CountCargo(flightId string) (int64, error) {
+	var count int64
+	err := r.db.Model(&ds.FlightCargo{}).
+		Where("flight_id = ?", flightId).
+		Count(&count).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

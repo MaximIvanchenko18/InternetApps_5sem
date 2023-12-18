@@ -1,4 +1,15 @@
 ServiceHost = "0.0.0.0"
 ServicePort = 80
-MinioEndPoint = "0.0.0.0:9000"
+Token = "secret_token"
+
+[minio]
+Endpoint = "localhost:9000"
 BucketName = "images"
+
+[jwt]
+Token = "maxos"
+ExpiresIn = "1h"
+
+[Redis]
+DialTimeout = "10s"
+ReadTimeout = "10s"

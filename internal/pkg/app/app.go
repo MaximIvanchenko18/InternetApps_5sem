@@ -1,10 +1,9 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"time"
-
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
@@ -12,13 +11,19 @@ import (
 
 	"InternetApps_5sem/internal/app/config"
 	"InternetApps_5sem/internal/app/dsn"
+	"InternetApps_5sem/internal/app/redis"
 	"InternetApps_5sem/internal/app/repository"
+	"InternetApps_5sem/internal/app/role"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Application struct {
 	repo        *repository.Repository
 	config      *config.Config
 	minioClient *minio.Client
+	redisClient *redis.Client
 }
 
 func (app *Application) StartServer() {
@@ -27,28 +32,43 @@ func (app *Application) StartServer() {
 	r := gin.Default()
 	r.Use(ErrorHandler())
 
-	r.Static("/image", "./resources")         // images
-	r.Static("/styles", "./templates/styles") // css-files
+	api := r.Group("/api")
+	{
+		// ГРУЗЫ (услуги)
+		c := api.Group("/cargo")
+		{
+			c.GET("", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetAllCargo)        // Отфильтрованный список
+			c.GET("/:cargo_id", app.WithAuthCheck(role.NotAuthorized, role.Customer, role.Moderator), app.GetCargo) // Один груз
+			c.DELETE("/:cargo_id", app.WithAuthCheck(role.Moderator), app.DeleteCargo)                              // Удаление груза
+			c.PUT("/:cargo_id", app.WithAuthCheck(role.Moderator), app.ChangeCargo)                                 // Изменение груза
+			c.POST("", app.WithAuthCheck(role.Moderator), app.AddCargo)                                             // Добавление груза
+			c.POST("/:cargo_id/add_to_flight", app.WithAuthCheck(role.Customer, role.Moderator), app.AddToFlight)   // Добавление в полет
+		}
+		// ПОЛЕТЫ (заявки)
+		f := api.Group("/flights")
+		{
+			f.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllFlights)                                              // Отфильтрованный список (интервал дат и статус)
+			f.GET("/:flight_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetFlight)                                       // Один полет
+			f.PUT("/:flight_id", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateFlight)                                    // Изменение полета (тип ракеты)
+			f.DELETE("/:flight_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFlight)                                 // Удаление полета
+			f.DELETE("/:flight_id/delete_cargo/:cargo_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromFlight)      // Удаление груза из заявки
+			f.PUT("/:flight_id/change_cargo/:cargo_id", app.WithAuthCheck(role.Customer, role.Customer), app.UpdateFlightCargoQuantity) // Изменение кол-ва груза в полете
+			f.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
+			f.PUT("/:flight_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                             // Завершить/отклонить модератором
+			f.PUT("/:flight_id/shipment", app.Shipment)
+		}
+		// ПОЛЬЗОВАТЕЛИ (авторизация)
+		u := api.Group("/user")
+		{
+			u.POST("/sign_up", app.Register)
+			u.POST("/login", app.Login)
+			u.POST("/logout", app.Logout)
+		}
+	}
 
-	// ГРУЗЫ (услуги)
-	r.GET("/api/cargo", app.GetAllCargo)                          // Отфильтрованный список
-	r.GET("/api/cargo/:cargo_id", app.GetCargo)                   // Один груз
-	r.DELETE("/api/cargo/:cargo_id", app.DeleteCargo)             // Удаление груза
-	r.PUT("/api/cargo/:cargo_id", app.ChangeCargo)                // Изменение груза
-	r.POST("/api/cargo", app.AddCargo)                            // Добавление груза
-	r.POST("/api/cargo/:cargo_id/add_to_flight", app.AddToFlight) // Добавление в полет
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// ПОЛЕТЫ (заявки)
-	r.GET("/api/flights", app.GetAllFlights)                                               // Отфильтрованный список (интервал дат и статус)
-	r.GET("/api/flights/:flight_id", app.GetFlight)                                        // Один полет
-	r.PUT("/api/flights/:flight_id/update", app.UpdateFlight)                              // Изменение полета (тип ракеты)
-	r.DELETE("/api/flights/:flight_id", app.DeleteFlight)                                  // Удаление полета
-	r.DELETE("/api/flights/:flight_id/delete_cargo/:cargo_id", app.DeleteFromFlight)       // Удаление груза из заявки
-	r.PUT("/api/flights/:flight_id/change_cargo/:cargo_id", app.UpdateFlightCargoQuantity) // Изменение кол-ва груза в полете
-	r.PUT("/api/flights/:flight_id/user_confirm", app.UserConfirm)                         // Сформировать создателем
-	r.PUT("/api/flights/:flight_id/moderator_confirm", app.ModeratorConfirm)               // Завершить/отклонить модератором
-
-	r.Run("0.0.0.0:7000") // listen and serve on 0.0.0.0:7000 (for windows "localhost:7000")
+	r.Run(fmt.Sprintf("%s:%d", app.config.ServiceHost, app.config.ServicePort))
 
 	log.Println("Server down")
 }
@@ -68,7 +88,7 @@ func New() (*Application, error) {
 		return nil, err
 	}
 
-	app.minioClient, err = minio.New(app.config.MinioEndPoint, &minio.Options{
+	app.minioClient, err = minio.New(app.config.Minio.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4("", "", ""),
 		Secure: false,
 	})
@@ -76,28 +96,10 @@ func New() (*Application, error) {
 		return nil, err
 	}
 
-	return &app, nil
-}
-
-func ErrorHandler() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Next()
-		for _, err := range c.Errors {
-			log.Println(err.Err)
-		}
-
-		lastError := c.Errors.Last()
-		if lastError != nil {
-			switch c.Writer.Status() {
-			case http.StatusBadRequest:
-				c.JSON(-1, gin.H{"error": "wrong request"})
-			case http.StatusNotFound:
-				c.JSON(-1, gin.H{"error": lastError.Error()})
-			case http.StatusMethodNotAllowed:
-				c.JSON(-1, gin.H{"error": lastError.Error()})
-			default:
-				c.Status(-1)
-			}
-		}
+	app.redisClient, err = redis.New(app.config.Redis)
+	if err != nil {
+		return nil, err
 	}
+
+	return &app, nil
 }

@@ -19,7 +19,7 @@ type GetAllCargosRequest struct {
 
 type AddCargoRequest struct {
 	ds.Cargo
-	Image *multipart.FileHeader `form:"image" json:"image" binding:"required"`
+	Image *multipart.FileHeader `form:"image" json:"image"`
 }
 
 type ChangeCargoRequest struct {
@@ -72,12 +72,30 @@ type UpdateFlightCargoQuantityRequest struct {
 }
 
 type UserConfirmRequest struct {
-	FlightId string `uri:"flight_id" binding:"required,uuid"`
+	Confirm bool `form:"confirm" binding:"required"`
 }
 
 type ModeratorConfirmRequest struct {
 	URI struct {
 		FlightId string `uri:"flight_id" binding:"required,uuid"`
 	}
-	Status string `form:"status" json:"status" binding:"required"`
+	Confirm bool `form:"confirm" binding:"required"`
+}
+
+type LoginReq struct {
+	Login    string `form:"login" binding:"required,max=30"`
+	Password string `form:"password" binding:"required,max=40"`
+}
+
+type RegisterReq struct {
+	Login    string `form:"login" binding:"required,max=30"`
+	Password string `form:"password" binding:"required,max=40"`
+}
+
+type ShipmentReq struct {
+	URI struct {
+		FlightId string `uri:"flight_id" binding:"required,uuid"`
+	}
+	ShipmentStatus bool   `form:"shipment_status" binding:"required"`
+	Token          string `form:"token" binding:"required"`
 }
