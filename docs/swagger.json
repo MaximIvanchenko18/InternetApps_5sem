@@ -375,13 +375,6 @@
                 "summary": "Указать тип ракеты",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Тип ракеты",
                         "name": "rocket_type",
                         "in": "body",
@@ -406,15 +399,6 @@
                     "Полеты"
                 ],
                 "summary": "Удалить полет",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -475,13 +459,6 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "id груза",
                         "name": "cargo_id",
                         "in": "path",
@@ -525,7 +502,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.FlightOutput"
+                        }
                     }
                 }
             }

@@ -11,9 +11,9 @@ const StatusFormed string = "сформирован"
 const StatusCompleted string = "завершен"
 const StatusRejected string = "отклонен"
 
-const ShipmentCompleted string = "отправлено"
-const ShipmentFailed string = "отправка отменена"
-const ShipmentStarted string = "отправка начата"
+const ShipmentCompleted string = "доставлено"
+const ShipmentFailed string = "доставка отменена"
+const ShipmentStarted string = "передано в доставку"
 
 type User struct {
 	UUID     string `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"-"`

@@ -124,10 +124,16 @@ func (app *Application) DeleteCargo(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	if cargo == nil {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("груз не найден"))
 		return
+	}
+	if cargo.Photo != nil {
+		err = app.deleteImage(c, cargo.UUID)
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
 	}
 
 	cargo.Photo = nil
@@ -213,7 +219,6 @@ func (app *Application) ChangeCargo(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-
 	err = c.ShouldBind(&request)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -225,7 +230,6 @@ func (app *Application) ChangeCargo(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	if cargo == nil {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("груз не найден"))
 		return
@@ -314,7 +318,6 @@ func (app *Application) AddToFlight(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	if flight == nil {
 		flight, err = app.repo.CreateDraftFlight(userId)
 		if err != nil {

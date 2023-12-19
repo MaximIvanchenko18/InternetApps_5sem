@@ -362,12 +362,6 @@ paths:
   /api/flights/{flight_id}:
     delete:
       description: Удаляет полет по id
-      parameters:
-      - description: id полета
-        in: path
-        name: flight_id
-        required: true
-        type: string
       responses:
         "200":
           description: OK
@@ -395,11 +389,6 @@ paths:
     put:
       description: Позволяет изменить тип ракеты
       parameters:
-      - description: id полета
-        in: path
-        name: flight_id
-        required: true
-        type: string
       - description: Тип ракеты
         in: body
         name: rocket_type
@@ -447,11 +436,6 @@ paths:
     delete:
       description: Удалить груз из полета
       parameters:
-      - description: id полета
-        in: path
-        name: flight_id
-        required: true
-        type: string
       - description: id груза
         in: path
         name: cargo_id
@@ -485,6 +469,8 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/schemes.FlightOutput'
       summary: Завершить полет
       tags:
       - Полеты

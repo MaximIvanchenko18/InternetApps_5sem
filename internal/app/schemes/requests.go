@@ -52,15 +52,11 @@ type FlightRequest struct {
 }
 
 type UpdateFlightRequest struct {
-	URI struct {
-		FlightId string `uri:"flight_id" binding:"required,uuid"`
-	}
 	RocketType string `form:"rocket_type" json:"rocket_type" binding:"required,max=50"`
 }
 
 type DeleteFromFlightRequest struct {
-	FlightId string `uri:"flight_id" binding:"required,uuid"`
-	CargoId  string `uri:"cargo_id" binding:"required,uuid"`
+	CargoId string `uri:"cargo_id" binding:"required,uuid"`
 }
 
 type UpdateFlightCargoQuantityRequest struct {
@@ -71,15 +67,11 @@ type UpdateFlightCargoQuantityRequest struct {
 	Quantity uint `form:"quantity"`
 }
 
-type UserConfirmRequest struct {
-	Confirm bool `form:"confirm" binding:"required"`
-}
-
 type ModeratorConfirmRequest struct {
 	URI struct {
 		FlightId string `uri:"flight_id" binding:"required,uuid"`
 	}
-	Confirm bool `form:"confirm" binding:"required"`
+	Confirm *bool `form:"confirm" binding:"required"`
 }
 
 type LoginReq struct {
@@ -96,6 +88,6 @@ type ShipmentReq struct {
 	URI struct {
 		FlightId string `uri:"flight_id" binding:"required,uuid"`
 	}
-	ShipmentStatus bool   `form:"shipment_status" binding:"required"`
-	Token          string `form:"token" binding:"required"`
+	ShipmentStatus *bool  `json:"shipment_status" form:"shipment_status" binding:"required"`
+	Token          string `json:"token" form:"token" binding:"required"`
 }

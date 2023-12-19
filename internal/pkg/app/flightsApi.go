@@ -103,25 +103,20 @@ type SwaggerUpdateFlightRequest struct {
 // @Description	Позволяет изменить тип ракеты
 // @Access		json
 // @Produce		json
-// @Param		flight_id path string true "id полета"
 // @Param		rocket_type body SwaggerUpdateFlightRequest true "Тип ракеты"
 // @Success		200 {object} schemes.UpdateFlightResponse
 // @Router		/api/flights/{flight_id} [put]
 func (app *Application) UpdateFlight(c *gin.Context) {
 	var request schemes.UpdateFlightRequest
-	err := c.ShouldBindUri(&request.URI)
-	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-	err = c.ShouldBind(&request)
+
+	err := c.ShouldBind(&request)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
 	userId := getUserId(c)
-	flight, err := app.repo.GetFlightById(request.URI.FlightId, &userId)
+	flight, err := app.repo.GetDraftFlight(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -139,45 +134,27 @@ func (app *Application) UpdateFlight(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.UpdateFlightResponse{Flight: schemes.ConvertFlight(flight)})
+	c.JSON(http.StatusOK, schemes.ConvertFlight(flight))
 }
 
 // @Summary		Удалить полет
 // @Tags		Полеты
 // @Description	Удаляет полет по id
-// @Param		flight_id path string true "id полета"
 // @Success		200
 // @Router		/api/flights/{flight_id} [delete]
 func (app *Application) DeleteFlight(c *gin.Context) {
-	var request schemes.FlightRequest
-	err := c.ShouldBindUri(&request)
-	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
 	userId := getUserId(c)
-	userRole := getUserRole(c)
-	var flight *ds.Flight
-	if userRole == role.Moderator {
-		flight, err = app.repo.GetFlightById(request.FlightId, nil)
-	} else {
-		flight, err = app.repo.GetFlightById(request.FlightId, &userId)
-	}
+	flight, err := app.repo.GetDraftFlight(userId)
+
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-
 	if flight == nil {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("полет не найден"))
 		return
 	}
 
-	if userRole == role.Customer && flight.Status != ds.StatusDraft {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("полет уже сформирован"))
-		return
-	}
 	flight.Status = ds.StatusDeleted
 
 	err = app.repo.SaveFlight(flight)
@@ -193,7 +170,6 @@ func (app *Application) DeleteFlight(c *gin.Context) {
 // @Tags		Полеты
 // @Description	Удалить груз из полета
 // @Produce		json
-// @Param		flight_id path string true "id полета"
 // @Param		cargo_id path string true "id груза"
 // @Success		200 {object} schemes.AllCargosResponse
 // @Router		/api/flights/{flight_id}/delete_cargo/{cargo_id} [delete]
@@ -206,13 +182,7 @@ func (app *Application) DeleteFromFlight(c *gin.Context) {
 	}
 
 	userId := getUserId(c)
-	userRole := getUserRole(c)
-	var flight *ds.Flight
-	if userRole == role.Moderator {
-		flight, err = app.repo.GetFlightById(request.FlightId, nil)
-	} else {
-		flight, err = app.repo.GetFlightById(request.FlightId, &userId)
-	}
+	flight, err := app.repo.GetDraftFlight(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -221,18 +191,14 @@ func (app *Application) DeleteFromFlight(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("полет не найден"))
 		return
 	}
-	if flight.Status != ds.StatusDraft {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя редактировать полет статуса: %s", flight.Status))
-		return
-	}
 
-	err = app.repo.DeleteFromFlight(request.FlightId, request.CargoId)
+	err = app.repo.DeleteFromFlight(flight.UUID, request.CargoId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	cargos, err := app.repo.GetFlightCargos(request.FlightId)
+	cargos, err := app.repo.GetFlightCargos(flight.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -329,10 +295,6 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("полет не найден"))
 		return
 	}
-	if flight.Status != ds.StatusDraft {
-		c.AbortWithError(http.StatusMethodNotAllowed, fmt.Errorf("нельзя сформировать полет статуса %s", flight.Status))
-		return
-	}
 	err = shipmentRequest(flight.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`shipment service is unavailable: {%s}`, err))
@@ -359,7 +321,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Description	Завершить или отклонить полет модератором
 // @Param		flight_id path string true "id полета"
 // @Param		confirm body boolean true "подтвердить"
-// @Success		200
+// @Success		200 {object} schemes.FlightOutput
 // @Router		/api/flights/{flight_id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
@@ -389,7 +351,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	if request.Confirm {
+	if *request.Confirm {
 		flight.Status = ds.StatusCompleted
 		now := time.Now()
 		flight.CompletionDate = &now
@@ -405,7 +367,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, schemes.ConvertFlight(flight))
 }
 
 func (app *Application) Shipment(c *gin.Context) {
@@ -435,13 +397,13 @@ func (app *Application) Shipment(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("груз не найден"))
 		return
 	}
-	if flight.Status != ds.StatusFormed || *flight.ShipmentStatus != ds.ShipmentStarted {
+	/*if flight.Status != ds.StatusFormed || *flight.ShipmentStatus != ds.ShipmentStarted {
 		c.AbortWithStatus(http.StatusMethodNotAllowed)
 		return
-	}
+	}*/
 
 	var shipmentStatus string
-	if request.ShipmentStatus {
+	if *request.ShipmentStatus {
 		shipmentStatus = ds.ShipmentCompleted
 	} else {
 		shipmentStatus = ds.ShipmentFailed

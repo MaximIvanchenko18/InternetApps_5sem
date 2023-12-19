@@ -379,13 +379,6 @@ const docTemplate = `{
                 "summary": "Указать тип ракеты",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Тип ракеты",
                         "name": "rocket_type",
                         "in": "body",
@@ -410,15 +403,6 @@ const docTemplate = `{
                     "Полеты"
                 ],
                 "summary": "Удалить полет",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -479,13 +463,6 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
                         "description": "id груза",
                         "name": "cargo_id",
                         "in": "path",
@@ -529,7 +506,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.FlightOutput"
+                        }
                     }
                 }
             }
