@@ -104,8 +104,8 @@ type SwaggerUpdateFlightRequest struct {
 // @Access		json
 // @Produce		json
 // @Param		rocket_type body SwaggerUpdateFlightRequest true "Тип ракеты"
-// @Success		200 {object} schemes.UpdateFlightResponse
-// @Router		/api/flights/{flight_id} [put]
+// @Success		200 {object} schemes.FlightOutput
+// @Router		/api/flights [put]
 func (app *Application) UpdateFlight(c *gin.Context) {
 	var request schemes.UpdateFlightRequest
 
@@ -137,11 +137,11 @@ func (app *Application) UpdateFlight(c *gin.Context) {
 	c.JSON(http.StatusOK, schemes.ConvertFlight(flight))
 }
 
-// @Summary		Удалить полет
+// @Summary		Удалить черновой полет
 // @Tags		Полеты
-// @Description	Удаляет полет по id
+// @Description	Удаляет черновой полет пользователя
 // @Success		200
-// @Router		/api/flights/{flight_id} [delete]
+// @Router		/api/flights [delete]
 func (app *Application) DeleteFlight(c *gin.Context) {
 	userId := getUserId(c)
 	flight, err := app.repo.GetDraftFlight(userId)
@@ -166,13 +166,13 @@ func (app *Application) DeleteFlight(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// @Summary		Удалить груз из полета
+// @Summary		Удалить груз из чернового полета
 // @Tags		Полеты
-// @Description	Удалить груз из полета
+// @Description	Удалить груз из черного полета пользователя
 // @Produce		json
 // @Param		cargo_id path string true "id груза"
 // @Success		200 {object} schemes.AllCargosResponse
-// @Router		/api/flights/{flight_id}/delete_cargo/{cargo_id} [delete]
+// @Router		/api/flights/delete_cargo/{cargo_id} [delete]
 func (app *Application) DeleteFromFlight(c *gin.Context) {
 	var request schemes.DeleteFromFlightRequest
 	err := c.ShouldBindUri(&request)
@@ -295,6 +295,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("полет не найден"))
 		return
 	}
+
 	err = shipmentRequest(flight.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`shipment service is unavailable: {%s}`, err))
@@ -318,7 +319,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 
 // @Summary		Завершить полет
 // @Tags		Полеты
-// @Description	Завершить или отклонить полет модератором
+// @Description	Подтвердить или отклонить полет модератором
 // @Param		flight_id path string true "id полета"
 // @Param		confirm body boolean true "подтвердить"
 // @Success		200 {object} schemes.FlightOutput
@@ -359,7 +360,13 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		flight.Status = ds.StatusRejected
 	}
 
+	moderator, err := app.repo.GetUserById(userId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 	flight.ModeratorId = &userId
+	flight.Moderator = moderator
 
 	err = app.repo.SaveFlight(flight)
 	if err != nil {
@@ -397,10 +404,6 @@ func (app *Application) Shipment(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, fmt.Errorf("груз не найден"))
 		return
 	}
-	/*if flight.Status != ds.StatusFormed || *flight.ShipmentStatus != ds.ShipmentStarted {
-		c.AbortWithStatus(http.StatusMethodNotAllowed)
-		return
-	}*/
 
 	var shipmentStatus string
 	if *request.ShipmentStatus {

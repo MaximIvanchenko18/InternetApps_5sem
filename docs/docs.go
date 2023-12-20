@@ -321,6 +321,76 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "put": {
+                "description": "Позволяет изменить тип ракеты",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Полеты"
+                ],
+                "summary": "Указать тип ракеты",
+                "parameters": [
+                    {
+                        "description": "Тип ракеты",
+                        "name": "rocket_type",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.SwaggerUpdateFlightRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.FlightOutput"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Удаляет черновой полет пользователя",
+                "tags": [
+                    "Полеты"
+                ],
+                "summary": "Удалить черновой полет",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/flights/delete_cargo/{cargo_id}": {
+            "delete": {
+                "description": "Удалить груз из черного полета пользователя",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Полеты"
+                ],
+                "summary": "Удалить груз из чернового полета",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id груза",
+                        "name": "cargo_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemes.AllCargosResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/flights/user_confirm": {
@@ -367,47 +437,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Позволяет изменить тип ракеты",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Полеты"
-                ],
-                "summary": "Указать тип ракеты",
-                "parameters": [
-                    {
-                        "description": "Тип ракеты",
-                        "name": "rocket_type",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/app.SwaggerUpdateFlightRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.UpdateFlightResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Удаляет полет по id",
-                "tags": [
-                    "Полеты"
-                ],
-                "summary": "Удалить полет",
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                }
             }
         },
         "/api/flights/{flight_id}/change_cargo/{cargo_id}": {
@@ -450,38 +479,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/flights/{flight_id}/delete_cargo/{cargo_id}": {
-            "delete": {
-                "description": "Удалить груз из полета",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Полеты"
-                ],
-                "summary": "Удалить груз из полета",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id груза",
-                        "name": "cargo_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AllCargosResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/flights/{flight_id}/moderator_confirm": {
             "put": {
-                "description": "Завершить или отклонить полет модератором",
+                "description": "Подтвердить или отклонить полет модератором",
                 "tags": [
                     "Полеты"
                 ],
@@ -813,14 +813,6 @@ const docTemplate = `{
                 },
                 "token_type": {
                     "type": "string"
-                }
-            }
-        },
-        "schemes.UpdateFlightResponse": {
-            "type": "object",
-            "properties": {
-                "flight": {
-                    "$ref": "#/definitions/schemes.FlightOutput"
                 }
             }
         }

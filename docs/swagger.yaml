@@ -142,11 +142,6 @@ definitions:
       token_type:
         type: string
     type: object
-  schemes.UpdateFlightResponse:
-    properties:
-      flight:
-        $ref: '#/definitions/schemes.FlightOutput'
-    type: object
 host: 127.0.0.1:8000
 info:
   contact: {}
@@ -334,6 +329,14 @@ paths:
       tags:
       - Грузы
   /api/flights:
+    delete:
+      description: Удаляет черновой полет пользователя
+      responses:
+        "200":
+          description: OK
+      summary: Удалить черновой полет
+      tags:
+      - Полеты
     get:
       description: Возвращает все полеты с фильтрацией по статусу и дате формирования
       parameters:
@@ -359,15 +362,26 @@ paths:
       summary: Получить все полеты
       tags:
       - Полеты
-  /api/flights/{flight_id}:
-    delete:
-      description: Удаляет полет по id
+    put:
+      description: Позволяет изменить тип ракеты
+      parameters:
+      - description: Тип ракеты
+        in: body
+        name: rocket_type
+        required: true
+        schema:
+          $ref: '#/definitions/app.SwaggerUpdateFlightRequest'
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-      summary: Удалить полет
+          schema:
+            $ref: '#/definitions/schemes.FlightOutput'
+      summary: Указать тип ракеты
       tags:
       - Полеты
+  /api/flights/{flight_id}:
     get:
       description: Возвращает подробную информацию о полете
       parameters:
@@ -384,25 +398,6 @@ paths:
           schema:
             $ref: '#/definitions/schemes.FlightResponse'
       summary: Получить один полет
-      tags:
-      - Полеты
-    put:
-      description: Позволяет изменить тип ракеты
-      parameters:
-      - description: Тип ракеты
-        in: body
-        name: rocket_type
-        required: true
-        schema:
-          $ref: '#/definitions/app.SwaggerUpdateFlightRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemes.UpdateFlightResponse'
-      summary: Указать тип ракеты
       tags:
       - Полеты
   /api/flights/{flight_id}/change_cargo/{cargo_id}:
@@ -432,28 +427,9 @@ paths:
       summary: Изменить количество груза в полете
       tags:
       - Полеты
-  /api/flights/{flight_id}/delete_cargo/{cargo_id}:
-    delete:
-      description: Удалить груз из полета
-      parameters:
-      - description: id груза
-        in: path
-        name: cargo_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/schemes.AllCargosResponse'
-      summary: Удалить груз из полета
-      tags:
-      - Полеты
   /api/flights/{flight_id}/moderator_confirm:
     put:
-      description: Завершить или отклонить полет модератором
+      description: Подтвердить или отклонить полет модератором
       parameters:
       - description: id полета
         in: path
@@ -472,6 +448,25 @@ paths:
           schema:
             $ref: '#/definitions/schemes.FlightOutput'
       summary: Завершить полет
+      tags:
+      - Полеты
+  /api/flights/delete_cargo/{cargo_id}:
+    delete:
+      description: Удалить груз из черного полета пользователя
+      parameters:
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemes.AllCargosResponse'
+      summary: Удалить груз из чернового полета
       tags:
       - Полеты
   /api/flights/user_confirm:

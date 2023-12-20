@@ -36,7 +36,7 @@ func (app *Application) uploadImage(c *gin.Context, image *multipart.FileHeader,
 	if err != nil {
 		return nil, err
 	}
-	imageURL := fmt.Sprintf("%s/%s/%s", app.config.Minio.Endpoint, app.config.Minio.BucketName, imageName)
+	imageURL := fmt.Sprintf("http://%s/%s/%s", app.config.Minio.Endpoint, app.config.Minio.BucketName, imageName)
 	return &imageURL, nil
 }
 
@@ -68,7 +68,7 @@ func generateHashString(s string) string {
 }
 
 func shipmentRequest(flight_id string) error {
-	url := "http://localhost:8000/api/shipment"
+	url := "http://localhost:4000/api/shipment"
 	payload := fmt.Sprintf(`{"flight_id": "%s"}`, flight_id)
 
 	resp, err := http.Post(url, "application/json", bytes.NewBufferString(payload))
