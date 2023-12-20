@@ -302,6 +302,13 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
+	customer, err := app.repo.GetUserById(userId)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	flight.Customer = *customer
+
 	shipmentStatus := ds.ShipmentStarted
 	flight.ShipmentStatus = &shipmentStatus
 	flight.Status = ds.StatusFormed
@@ -354,11 +361,11 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 
 	if *request.Confirm {
 		flight.Status = ds.StatusCompleted
-		now := time.Now()
-		flight.CompletionDate = &now
 	} else {
 		flight.Status = ds.StatusRejected
 	}
+	now := time.Now()
+	flight.CompletionDate = &now
 
 	moderator, err := app.repo.GetUserById(userId)
 	if err != nil {
