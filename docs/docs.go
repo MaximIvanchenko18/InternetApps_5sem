@@ -596,7 +596,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.RegisterResp"
+                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
                         }
                     }
                 }
@@ -794,14 +794,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.RegisterResp": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
-                }
-            }
-        },
         "schemes.SwaggerLoginResp": {
             "type": "object",
             "properties": {
@@ -809,6 +801,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "expires_in": {
+                    "type": "integer"
+                },
+                "role": {
                     "type": "integer"
                 },
                 "token_type": {

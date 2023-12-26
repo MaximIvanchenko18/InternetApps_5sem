@@ -128,16 +128,13 @@ definitions:
     - login
     - password
     type: object
-  schemes.RegisterResp:
-    properties:
-      ok:
-        type: boolean
-    type: object
   schemes.SwaggerLoginResp:
     properties:
       access_token:
         type: string
       expires_in:
+        type: integer
+      role:
         type: integer
       token_type:
         type: string
@@ -534,7 +531,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/schemes.RegisterResp'
+            $ref: '#/definitions/schemes.SwaggerLoginResp'
       summary: Регистрация
       tags:
       - Авторизация

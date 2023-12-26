@@ -2,6 +2,7 @@ package schemes
 
 import (
 	"InternetApps_5sem/internal/app/ds"
+	"InternetApps_5sem/internal/app/role"
 	"time"
 )
 
@@ -75,18 +76,16 @@ type AddToFlightResp struct {
 	CargoCount int64 `json:"cargo_count"`
 }
 
-type LoginResp struct {
+type AuthResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`
+	Role        role.Role     `json:"role"`
 	TokenType   string        `json:"token_type"`
 }
 
 type SwaggerLoginResp struct {
 	ExpiresIn   int64  `json:"expires_in"`
 	AccessToken string `json:"access_token"`
+	Role        int    `json:"role"`
 	TokenType   string `json:"token_type"`
-}
-
-type RegisterResp struct {
-	Ok bool `json:"ok"`
 }

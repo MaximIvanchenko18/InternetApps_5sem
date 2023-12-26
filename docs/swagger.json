@@ -592,7 +592,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/schemes.RegisterResp"
+                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
                         }
                     }
                 }
@@ -790,14 +790,6 @@
                 }
             }
         },
-        "schemes.RegisterResp": {
-            "type": "object",
-            "properties": {
-                "ok": {
-                    "type": "boolean"
-                }
-            }
-        },
         "schemes.SwaggerLoginResp": {
             "type": "object",
             "properties": {
@@ -805,6 +797,9 @@
                     "type": "string"
                 },
                 "expires_in": {
+                    "type": "integer"
+                },
+                "role": {
                     "type": "integer"
                 },
                 "token_type": {
