@@ -42,8 +42,8 @@ type AddToFlightRequest struct {
 }
 
 type GetAllFlightsRequest struct {
-	FormDateStart *time.Time `form:"form_date_start" json:"form_date_start" time_format:"2006-01-02 15:04:05"`
-	FormDateEnd   *time.Time `form:"form_date_end" json:"form_date_end" time_format:"2006-01-02 15:04:05"`
+	FormDateStart *time.Time `form:"form_date_start" json:"form_date_start" time_format:"2006-01-02 15:04"`
+	FormDateEnd   *time.Time `form:"form_date_end" json:"form_date_end" time_format:"2006-01-02 15:04"`
 	Status        string     `form:"status"`
 }
 

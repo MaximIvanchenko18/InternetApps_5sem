@@ -12,7 +12,7 @@ type AllCargosResponse struct {
 
 type FlightShort struct {
 	UUID       string `json:"uuid"`
-	CargoCount int    `json:"cargo_count"`
+	CargoCount int64  `json:"cargo_count"`
 }
 
 type GetAllCargosResponse struct {
@@ -49,19 +49,19 @@ func ConvertFlight(flight *ds.Flight) FlightOutput {
 	output := FlightOutput{
 		UUID:           flight.UUID,
 		Status:         flight.Status,
-		CreationDate:   flight.CreationDate.Format("2006-01-02 15:04:05"),
+		CreationDate:   flight.CreationDate.Format("2006-01-02T15:04:05Z07:00"),
 		RocketType:     flight.RocketType,
 		Customer:       flight.Customer.Login,
 		ShipmentStatus: flight.ShipmentStatus,
 	}
 
 	if flight.FormationDate != nil {
-		formationDate := flight.FormationDate.Format("2006-01-02 15:04:05")
+		formationDate := flight.FormationDate.Format("2006-01-02T15:04:05Z07:00")
 		output.FormationDate = &formationDate
 	}
 
 	if flight.CompletionDate != nil {
-		completionDate := flight.CompletionDate.Format("2006-01-02 15:04:05")
+		completionDate := flight.CompletionDate.Format("2006-01-02T15:04:05Z07:00")
 		output.CompletionDate = &completionDate
 	}
 
@@ -80,6 +80,7 @@ type AuthResp struct {
 	ExpiresIn   time.Duration `json:"expires_in"`
 	AccessToken string        `json:"access_token"`
 	Role        role.Role     `json:"role"`
+	Login       string        `json:"login"`
 	TokenType   string        `json:"token_type"`
 }
 
@@ -87,5 +88,6 @@ type SwaggerLoginResp struct {
 	ExpiresIn   int64  `json:"expires_in"`
 	AccessToken string `json:"access_token"`
 	Role        int    `json:"role"`
+	Login       string `json:"login"`
 	TokenType   string `json:"token_type"`
 }

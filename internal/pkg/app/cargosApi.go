@@ -70,7 +70,7 @@ func (app *Application) GetAllCargo(c *gin.Context) {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-		response.DraftFlight.CargoCount = int(cargoCount)
+		response.DraftFlight.CargoCount = cargoCount
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -286,7 +286,7 @@ func (app *Application) ChangeCargo(c *gin.Context) {
 // @Description	Добавить выбранный груз в черновик полета
 // @Produce		json
 // @Param		cargo_id path string true "id груза"
-// @Success		200 {object} schemes.AddToFlightResp
+// @Success		200 {object} schemes.FlightShort
 // @Router		/api/cargo/{cargo_id}/add_to_flight [post]
 func (app *Application) AddToFlight(c *gin.Context) {
 	var request schemes.AddToFlightRequest
@@ -338,5 +338,5 @@ func (app *Application) AddToFlight(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.AddToFlightResp{CargoCount: cargoCount})
+	c.JSON(http.StatusOK, schemes.FlightShort{UUID: flight.UUID, CargoCount: cargoCount})
 }
