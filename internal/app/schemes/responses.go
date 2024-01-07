@@ -10,14 +10,9 @@ type AllCargosResponse struct {
 	Cargos []ds.Cargo `json:"cargos"`
 }
 
-type FlightShort struct {
-	UUID       string `json:"uuid"`
-	CargoCount int64  `json:"cargo_count"`
-}
-
 type GetAllCargosResponse struct {
-	DraftFlight *FlightShort `json:"draft_flight"`
-	Cargos      []ds.Cargo   `json:"cargos"`
+	DraftFlight *string    `json:"draft_flight"`
+	Cargos      []ds.Cargo `json:"cargos"`
 }
 
 type AllFlightsResponse struct {

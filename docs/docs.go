@@ -257,9 +257,6 @@ const docTemplate = `{
         "/api/cargo/{cargo_id}/add_to_flight": {
             "post": {
                 "description": "Добавить выбранный груз в черновик полета",
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Грузы"
                 ],
@@ -275,10 +272,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AddToFlightResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -344,19 +338,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.FlightOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             },
             "delete": {
-                "description": "Удаляет черновой полет пользователя",
+                "description": "Удаляет полет-черновик пользователя",
                 "tags": [
                     "Полеты"
                 ],
-                "summary": "Удалить черновой полет",
+                "summary": "Удалить полет-черновик",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -366,14 +357,14 @@ const docTemplate = `{
         },
         "/api/flights/delete_cargo/{cargo_id}": {
             "delete": {
-                "description": "Удалить груз из черного полета пользователя",
+                "description": "Удалить груз из полета-черновика пользователя",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Полеты"
                 ],
-                "summary": "Удалить груз из чернового полета",
+                "summary": "Удалить груз из полета-черновика",
                 "parameters": [
                     {
                         "type": "string",
@@ -385,10 +376,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.AllCargosResponse"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -402,10 +390,7 @@ const docTemplate = `{
                 "summary": "Сформировать полет",
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.FlightOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -506,10 +491,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.FlightOutput"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -554,9 +536,6 @@ const docTemplate = `{
                 "consumes": [
                     "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Авторизация"
                 ],
@@ -572,9 +551,6 @@ const docTemplate = `{
             "post": {
                 "description": "Регистрация нового пользователя",
                 "consumes": [
-                    "application/json"
-                ],
-                "produces": [
                     "application/json"
                 ],
                 "tags": [
@@ -594,10 +570,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/schemes.SwaggerLoginResp"
-                        }
+                        "description": "OK"
                     }
                 }
             }
@@ -659,25 +632,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.AddToFlightResp": {
-            "type": "object",
-            "properties": {
-                "cargo_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "schemes.AllCargosResponse": {
-            "type": "object",
-            "properties": {
-                "cargos": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ds.Cargo"
-                    }
-                }
-            }
-        },
         "schemes.AllFlightsResponse": {
             "type": "object",
             "properties": {
@@ -735,17 +689,6 @@ const docTemplate = `{
                 }
             }
         },
-        "schemes.FlightShort": {
-            "type": "object",
-            "properties": {
-                "cargo_count": {
-                    "type": "integer"
-                },
-                "uuid": {
-                    "type": "string"
-                }
-            }
-        },
         "schemes.GetAllCargosResponse": {
             "type": "object",
             "properties": {
@@ -756,7 +699,7 @@ const docTemplate = `{
                     }
                 },
                 "draft_flight": {
-                    "$ref": "#/definitions/schemes.FlightShort"
+                    "type": "string"
                 }
             }
         },
@@ -802,6 +745,9 @@ const docTemplate = `{
                 },
                 "expires_in": {
                     "type": "integer"
+                },
+                "login": {
+                    "type": "string"
                 },
                 "role": {
                     "type": "integer"

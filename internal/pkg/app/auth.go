@@ -19,9 +19,8 @@ import (
 // @Tags		Авторизация
 // @Description	Регистрация нового пользователя
 // @Accept		json
-// @Produce		json
 // @Param		user_credentials body schemes.RegisterReq true "login and password"
-// @Success		200 {object} schemes.SwaggerLoginResp
+// @Success		200
 // @Router		/api/user/sign_up [post]
 func (app *Application) Register(c *gin.Context) {
 	request := &schemes.RegisterReq{}
@@ -46,7 +45,7 @@ func (app *Application) Register(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	if existing_user == nil {
+	if existing_user != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -63,34 +62,7 @@ func (app *Application) Register(c *gin.Context) {
 		return
 	}
 
-	JWTConfig := app.config.JWT
-	token := jwt.NewWithClaims(JWTConfig.SigningMethod, &ds.JWTClaims{
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "bitop-admin",
-		},
-		UserUUID: user.UUID,
-		Role:     user.Role,
-	})
-	if token == nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
-		return
-	}
-
-	strToken, err := token.SignedString([]byte(JWTConfig.Token))
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("cant create str token"))
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.AuthResp{
-		ExpiresIn:   JWTConfig.ExpiresIn,
-		AccessToken: strToken,
-		Role:        user.Role,
-		Login:       user.Login,
-		TokenType:   "Bearer",
-	})
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Авторизация
@@ -125,10 +97,10 @@ func (app *Application) Login(c *gin.Context) {
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(JWTConfig.ExpiresIn).Unix(),
 			IssuedAt:  time.Now().Unix(),
-			Issuer:    "bitop-admin",
 		},
 		UserUUID: user.UUID,
 		Role:     user.Role,
+		Login:    user.Login,
 	})
 	if token == nil {
 		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf("token is nil"))
@@ -154,7 +126,6 @@ func (app *Application) Login(c *gin.Context) {
 // @Tags		Авторизация
 // @Description	Выход из аккаунта
 // @Accept		json
-// @Produce		json
 // @Success		200
 // @Router		/api/user/logout [post]
 func (app *Application) Logout(c *gin.Context) {

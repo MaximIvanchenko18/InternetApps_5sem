@@ -52,25 +52,17 @@ func (app *Application) GetAllCargo(c *gin.Context) {
 		return
 	}
 
-	var draftFlight *ds.Flight = nil
+	response := schemes.GetAllCargosResponse{DraftFlight: nil, Cargos: cargos}
 	userId, exists := c.Get("userId")
 	if exists {
-		draftFlight, err = app.repo.GetDraftFlight(userId.(string))
+		draftFlight, err := app.repo.GetDraftFlight(userId.(string))
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}
-	}
-
-	response := schemes.GetAllCargosResponse{DraftFlight: nil, Cargos: cargos}
-	if draftFlight != nil {
-		response.DraftFlight = &schemes.FlightShort{UUID: draftFlight.UUID}
-		cargoCount, err := app.repo.CountCargo(draftFlight.UUID)
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
+		if draftFlight != nil {
+			response.DraftFlight = &draftFlight.UUID
 		}
-		response.DraftFlight.CargoCount = cargoCount
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -278,15 +270,14 @@ func (app *Application) ChangeCargo(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, cargo)
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Добавить груз в полет
 // @Tags		Грузы
 // @Description	Добавить выбранный груз в черновик полета
-// @Produce		json
 // @Param		cargo_id path string true "id груза"
-// @Success		200 {object} schemes.FlightShort
+// @Success		200
 // @Router		/api/cargo/{cargo_id}/add_to_flight [post]
 func (app *Application) AddToFlight(c *gin.Context) {
 	var request schemes.AddToFlightRequest
@@ -332,11 +323,5 @@ func (app *Application) AddToFlight(c *gin.Context) {
 		return
 	}
 
-	cargoCount, err := app.repo.CountCargo(flight.UUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.FlightShort{UUID: flight.UUID, CargoCount: cargoCount})
+	c.Status(http.StatusOK)
 }

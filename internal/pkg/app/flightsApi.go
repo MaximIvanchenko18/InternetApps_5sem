@@ -104,7 +104,7 @@ type SwaggerUpdateFlightRequest struct {
 // @Access		json
 // @Produce		json
 // @Param		rocket_type body SwaggerUpdateFlightRequest true "Тип ракеты"
-// @Success		200 {object} schemes.FlightOutput
+// @Success		200
 // @Router		/api/flights [put]
 func (app *Application) UpdateFlight(c *gin.Context) {
 	var request schemes.UpdateFlightRequest
@@ -134,12 +134,12 @@ func (app *Application) UpdateFlight(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.ConvertFlight(flight))
+	c.Status(http.StatusOK)
 }
 
-// @Summary		Удалить черновой полет
+// @Summary		Удалить полет-черновик
 // @Tags		Полеты
-// @Description	Удаляет черновой полет пользователя
+// @Description	Удаляет полет-черновик пользователя
 // @Success		200
 // @Router		/api/flights [delete]
 func (app *Application) DeleteFlight(c *gin.Context) {
@@ -166,12 +166,12 @@ func (app *Application) DeleteFlight(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// @Summary		Удалить груз из чернового полета
+// @Summary		Удалить груз из полета-черновика
 // @Tags		Полеты
-// @Description	Удалить груз из черного полета пользователя
+// @Description	Удалить груз из полета-черновика пользователя
 // @Produce		json
 // @Param		cargo_id path string true "id груза"
-// @Success		200 {object} schemes.AllCargosResponse
+// @Success		200
 // @Router		/api/flights/delete_cargo/{cargo_id} [delete]
 func (app *Application) DeleteFromFlight(c *gin.Context) {
 	var request schemes.DeleteFromFlightRequest
@@ -198,13 +198,7 @@ func (app *Application) DeleteFromFlight(c *gin.Context) {
 		return
 	}
 
-	cargos, err := app.repo.GetFlightCargos(flight.UUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, schemes.AllCargosResponse{Cargos: cargos})
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Изменить количество груза в полете
@@ -275,13 +269,13 @@ func (app *Application) UpdateFlightCargoQuantity(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, flightcargo)
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Сформировать полет
 // @Tags		Полеты
 // @Description	Сформировать полет пользователем
-// @Success		200 {object} schemes.FlightOutput
+// @Success		200
 // @Router		/api/flights/user_confirm [put]
 func (app *Application) UserConfirm(c *gin.Context) {
 	userId := getUserId(c)
@@ -321,7 +315,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.ConvertFlight(flight))
+	c.Status(http.StatusOK)
 }
 
 // @Summary		Завершить полет
@@ -329,7 +323,7 @@ func (app *Application) UserConfirm(c *gin.Context) {
 // @Description	Подтвердить или отклонить полет модератором
 // @Param		flight_id path string true "id полета"
 // @Param		confirm body boolean true "подтвердить"
-// @Success		200 {object} schemes.FlightOutput
+// @Success		200
 // @Router		/api/flights/{flight_id}/moderator_confirm [put]
 func (app *Application) ModeratorConfirm(c *gin.Context) {
 	var request schemes.ModeratorConfirmRequest
@@ -381,7 +375,7 @@ func (app *Application) ModeratorConfirm(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.ConvertFlight(flight))
+	c.Status(http.StatusOK)
 }
 
 func (app *Application) Shipment(c *gin.Context) {
