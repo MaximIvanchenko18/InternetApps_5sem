@@ -81,20 +81,24 @@ func (r *Repository) GetFlightById(flightId string, customerId *string) (*ds.Fli
 	return flight, nil
 }
 
-func (r *Repository) GetFlightCargos(flightId string) ([]ds.Cargo, error) {
-	var cargos []ds.Cargo
-
-	err := r.db.Table("flight_cargos").
-		Select("cargos.*").
+func (r *Repository) GetFlightCargos(flightId string) ([]ds.Cargo, []uint, error) {
+	query := r.db.Table("flight_cargos").
 		Joins("JOIN cargos ON flight_cargos.cargo_id = cargos.uuid").
-		Where(ds.FlightCargo{FlightId: flightId}).
-		Scan(&cargos).Error
+		Where(ds.FlightCargo{FlightId: flightId})
 
+	var cargos []ds.Cargo
+	err := query.Select("cargos.*").Scan(&cargos).Error
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return cargos, nil
+	var quantities []uint
+	err = query.Select("quantity").Scan(&quantities).Error
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return cargos, quantities, nil
 }
 
 func (r *Repository) SaveFlight(flight *ds.Flight) error {

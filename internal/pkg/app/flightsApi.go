@@ -85,13 +85,19 @@ func (app *Application) GetFlight(c *gin.Context) {
 		return
 	}
 
-	cargos, err := app.repo.GetFlightCargos(request.FlightId)
+	cargos, quantities, err := app.repo.GetFlightCargos(request.FlightId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	c.JSON(http.StatusOK, schemes.FlightResponse{Flight: schemes.ConvertFlight(flight), Cargos: cargos})
+	cargosQuantity := make([]schemes.CargoQuantity, len(cargos))
+	for i := 0; i < len(cargos); i++ {
+		cargosQuantity[i].Cargo = cargos[i]
+		cargosQuantity[i].Quantity = quantities[i]
+	}
+
+	c.JSON(http.StatusOK, schemes.FlightResponse{Flight: schemes.ConvertFlight(flight), Cargos: cargosQuantity})
 }
 
 type SwaggerUpdateFlightRequest struct {
@@ -205,11 +211,10 @@ func (app *Application) DeleteFromFlight(c *gin.Context) {
 // @Tags		Полеты
 // @Description	Изменить количество груза в полете
 // @Produce		json
-// @Param		flight_id path string true "id полета"
 // @Param		cargo_id path string true "id груза"
 // @Param		quantity query uint true "количество груза"
 // @Success		200
-// @Router		/api/flights/{flight_id}/change_cargo/{cargo_id} [put]
+// @Router		/api/flights/change_cargo/{cargo_id} [put]
 func (app *Application) UpdateFlightCargoQuantity(c *gin.Context) {
 	var request schemes.UpdateFlightCargoQuantityRequest
 	err := c.ShouldBindUri(&request.URI)
@@ -222,15 +227,13 @@ func (app *Application) UpdateFlightCargoQuantity(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
+	if request.Quantity <= 0 {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 
 	userId := getUserId(c)
-	userRole := getUserRole(c)
-	var flight *ds.Flight
-	if userRole == role.Moderator {
-		flight, err = app.repo.GetFlightById(request.URI.FlightId, nil)
-	} else {
-		flight, err = app.repo.GetFlightById(request.URI.FlightId, &userId)
-	}
+	flight, err := app.repo.GetDraftFlight(userId)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -244,7 +247,7 @@ func (app *Application) UpdateFlightCargoQuantity(c *gin.Context) {
 		return
 	}
 
-	cargos, err := app.repo.GetFlightCargos(request.URI.FlightId)
+	cargos, _, err := app.repo.GetFlightCargos(flight.UUID)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -262,7 +265,7 @@ func (app *Application) UpdateFlightCargoQuantity(c *gin.Context) {
 		return
 	}
 
-	flightcargo := &ds.FlightCargo{FlightId: request.URI.FlightId, CargoId: request.URI.CargoId, Quantity: request.Quantity}
+	flightcargo := &ds.FlightCargo{FlightId: flight.UUID, CargoId: request.URI.CargoId, Quantity: request.Quantity}
 	err = app.repo.SaveFlightCargo(flightcargo)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -290,11 +293,11 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	err = shipmentRequest(flight.UUID)
-	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`shipment service is unavailable: {%s}`, err))
-		return
-	}
+	// err = shipmentRequest(flight.UUID)
+	// if err != nil {
+	// 	c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`shipment service is unavailable: {%s}`, err))
+	// 	return
+	// }
 
 	customer, err := app.repo.GetUserById(userId)
 	if err != nil {

@@ -46,6 +46,13 @@ definitions:
           $ref: '#/definitions/schemes.FlightOutput'
         type: array
     type: object
+  schemes.CargoQuantity:
+    properties:
+      cargo_info:
+        $ref: '#/definitions/ds.Cargo'
+      cargo_quantity:
+        type: integer
+    type: object
   schemes.FlightOutput:
     properties:
       completion_date:
@@ -71,7 +78,7 @@ definitions:
     properties:
       cargos:
         items:
-          $ref: '#/definitions/ds.Cargo'
+          $ref: '#/definitions/schemes.CargoQuantity'
         type: array
       flight:
         $ref: '#/definitions/schemes.FlightOutput'
@@ -374,33 +381,6 @@ paths:
       summary: Получить один полет
       tags:
       - Полеты
-  /api/flights/{flight_id}/change_cargo/{cargo_id}:
-    put:
-      description: Изменить количество груза в полете
-      parameters:
-      - description: id полета
-        in: path
-        name: flight_id
-        required: true
-        type: string
-      - description: id груза
-        in: path
-        name: cargo_id
-        required: true
-        type: string
-      - description: количество груза
-        in: query
-        name: quantity
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-      summary: Изменить количество груза в полете
-      tags:
-      - Полеты
   /api/flights/{flight_id}/moderator_confirm:
     put:
       description: Подтвердить или отклонить полет модератором
@@ -420,6 +400,28 @@ paths:
         "200":
           description: OK
       summary: Завершить полет
+      tags:
+      - Полеты
+  /api/flights/change_cargo/{cargo_id}:
+    put:
+      description: Изменить количество груза в полете
+      parameters:
+      - description: id груза
+        in: path
+        name: cargo_id
+        required: true
+        type: string
+      - description: количество груза
+        in: query
+        name: quantity
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Изменить количество груза в полете
       tags:
       - Полеты
   /api/flights/delete_cargo/{cargo_id}:

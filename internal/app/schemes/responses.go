@@ -19,9 +19,14 @@ type AllFlightsResponse struct {
 	Flights []FlightOutput `json:"flights"`
 }
 
+type CargoQuantity struct {
+	Cargo    ds.Cargo `json:"cargo_info"`
+	Quantity uint     `json:"cargo_quantity"`
+}
+
 type FlightResponse struct {
-	Flight FlightOutput `json:"flight"`
-	Cargos []ds.Cargo   `json:"cargos"`
+	Flight FlightOutput    `json:"flight"`
+	Cargos []CargoQuantity `json:"cargos"`
 }
 
 type UpdateFlightResponse struct {

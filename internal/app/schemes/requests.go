@@ -61,8 +61,7 @@ type DeleteFromFlightRequest struct {
 
 type UpdateFlightCargoQuantityRequest struct {
 	URI struct {
-		FlightId string `uri:"flight_id" binding:"required,uuid"`
-		CargoId  string `uri:"cargo_id" binding:"required,uuid"`
+		CargoId string `uri:"cargo_id" binding:"required,uuid"`
 	}
 	Quantity uint `form:"quantity"`
 }

@@ -49,14 +49,14 @@ func (app *Application) StartServer() {
 		// ПОЛЕТЫ (заявки)
 		f := api.Group("/flights")
 		{
-			f.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllFlights)                                              // Отфильтрованный список (интервал дат и статус)
-			f.GET("/:flight_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetFlight)                                       // Один полет
-			f.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateFlight)                                               // Изменение полета (тип ракеты)
-			f.DELETE("", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFlight)                                            // Удаление полета
-			f.DELETE("/delete_cargo/:cargo_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromFlight)                 // Удаление груза из заявки
-			f.PUT("/:flight_id/change_cargo/:cargo_id", app.WithAuthCheck(role.Customer, role.Customer), app.UpdateFlightCargoQuantity) // Изменение кол-ва груза в полете
-			f.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                                   // Сформировать создателем
-			f.PUT("/:flight_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                             // Завершить/отклонить модератором
+			f.GET("", app.WithAuthCheck(role.Customer, role.Moderator), app.GetAllFlights)                                    // Отфильтрованный список (интервал дат и статус)
+			f.GET("/:flight_id", app.WithAuthCheck(role.Customer, role.Moderator), app.GetFlight)                             // Один полет
+			f.PUT("", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateFlight)                                     // Изменение полета (тип ракеты)
+			f.DELETE("", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFlight)                                  // Удаление полета
+			f.DELETE("/delete_cargo/:cargo_id", app.WithAuthCheck(role.Customer, role.Moderator), app.DeleteFromFlight)       // Удаление груза из заявки
+			f.PUT("/change_cargo/:cargo_id", app.WithAuthCheck(role.Customer, role.Moderator), app.UpdateFlightCargoQuantity) // Изменение кол-ва груза в полете
+			f.PUT("/user_confirm", app.WithAuthCheck(role.Customer, role.Moderator), app.UserConfirm)                         // Сформировать создателем
+			f.PUT("/:flight_id/moderator_confirm", app.WithAuthCheck(role.Moderator), app.ModeratorConfirm)                   // Завершить/отклонить модератором
 			f.PUT("/:flight_id/shipment", app.Shipment)
 		}
 		// ПОЛЬЗОВАТЕЛИ (авторизация)

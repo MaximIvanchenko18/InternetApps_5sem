@@ -1,9 +1,9 @@
 package app
 
 import (
-	"bytes"
+	//"bytes"
 	"fmt"
-	"net/http"
+	//"net/http"
 	"path/filepath"
 
 	"mime/multipart"
@@ -67,7 +67,7 @@ func generateHashString(s string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func shipmentRequest(flight_id string) error {
+/*func shipmentRequest(flight_id string) error {
 	url := "http://localhost:4000/api/shipment"
 	payload := fmt.Sprintf(`{"flight_id": "%s"}`, flight_id)
 
@@ -81,4 +81,4 @@ func shipmentRequest(flight_id string) error {
 	}
 
 	return nil
-}
+}*/

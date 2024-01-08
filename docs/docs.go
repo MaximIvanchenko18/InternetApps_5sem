@@ -355,6 +355,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/flights/change_cargo/{cargo_id}": {
+            "put": {
+                "description": "Изменить количество груза в полете",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Полеты"
+                ],
+                "summary": "Изменить количество груза в полете",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id груза",
+                        "name": "cargo_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "количество груза",
+                        "name": "quantity",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/api/flights/delete_cargo/{cargo_id}": {
             "delete": {
                 "description": "Удалить груз из полета-черновика пользователя",
@@ -420,46 +453,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/schemes.FlightResponse"
                         }
-                    }
-                }
-            }
-        },
-        "/api/flights/{flight_id}/change_cargo/{cargo_id}": {
-            "put": {
-                "description": "Изменить количество груза в полете",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Полеты"
-                ],
-                "summary": "Изменить количество груза в полете",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "id полета",
-                        "name": "flight_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "id груза",
-                        "name": "cargo_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "количество груза",
-                        "name": "quantity",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
                     }
                 }
             }
@@ -643,6 +636,17 @@ const docTemplate = `{
                 }
             }
         },
+        "schemes.CargoQuantity": {
+            "type": "object",
+            "properties": {
+                "cargo_info": {
+                    "$ref": "#/definitions/ds.Cargo"
+                },
+                "cargo_quantity": {
+                    "type": "integer"
+                }
+            }
+        },
         "schemes.FlightOutput": {
             "type": "object",
             "properties": {
@@ -681,7 +685,7 @@ const docTemplate = `{
                 "cargos": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/ds.Cargo"
+                        "$ref": "#/definitions/schemes.CargoQuantity"
                     }
                 },
                 "flight": {
