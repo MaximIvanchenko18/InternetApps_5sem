@@ -293,11 +293,11 @@ func (app *Application) UserConfirm(c *gin.Context) {
 		return
 	}
 
-	// err = shipmentRequest(flight.UUID)
-	// if err != nil {
-	// 	c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`shipment service is unavailable: {%s}`, err))
-	// 	return
-	// }
+	err = shipmentRequest(flight.UUID)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, fmt.Errorf(`shipment service is unavailable: {%s}`, err))
+		return
+	}
 
 	customer, err := app.repo.GetUserById(userId)
 	if err != nil {

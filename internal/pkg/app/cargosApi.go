@@ -151,7 +151,7 @@ func (app *Application) DeleteCargo(c *gin.Context) {
 // @Param     	weight formData float32 true "Вес" format:"float32"
 // @Param     	capacity formData float32 true "Объем" format:"float32"
 // @Param     	description formData string true "Описание" format:"string" maxLength:500
-// @Success		200
+// @Success		200 {object} string
 // @Router		/api/cargo/ [post]
 func (app *Application) AddCargo(c *gin.Context) {
 	var request schemes.AddCargoRequest
@@ -185,7 +185,7 @@ func (app *Application) AddCargo(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, cargo.UUID)
 }
 
 // @Summary		Изменить груз
