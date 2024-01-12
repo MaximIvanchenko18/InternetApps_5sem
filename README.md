@@ -21,6 +21,7 @@
 - [SPA (лаб 4)](https://github.com/MaximIvanchenko18/InternetApps_5sem_Frontend/tree/spa)
 - [Redux (лаб 6)](https://github.com/MaximIvanchenko18/InternetApps_5sem_Frontend/tree/redux)
 - [Pages](https://maximivanchenko18.github.io/InternetApps_5sem_Frontend/)
+- [Адаптивность дизайна (доп задание)](https://github.com/MaximIvanchenko18/InternetApps_5sem_Frontend/tree/pwa)
 
 # Мобильное приложение:
 - [React Native (лаб 7)](https://github.com/MaximIvanchenko18/InternetApps_5sem_Mobile/tree/nativeapp)
